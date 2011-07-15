@@ -47,11 +47,15 @@
 ;; In order for this module to do you any good, you should write your
 ;; file header comments in a way that make-readme-markdown.el
 ;; understands. An attempt has been made to support the most common
-;; file header comment style:
+;; file header comment style, so hopefully you shouldn't have to do
+;; anything...
 ;;
 ;; o ';;;' at the beginning of a line for a header.
 ;; o ';;`' at the beginning of a line for a code line.
 ;; o 'o' at the beginning of a line for a list item
+;;
+;; If there's some more syntax you would like to see supported, just
+;; drop me a line: mitch.special@gmail.com
 ;;
 ;;; Code
 
