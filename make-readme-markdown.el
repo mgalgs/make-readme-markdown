@@ -54,8 +54,12 @@
 ;; o ';;`' at the beginning of a line for a code line.
 ;; o 'o' at the beginning of a line for a list item
 ;;
-;; If there's some more syntax you would like to see supported, just
-;; drop me a line: mitch.special@gmail.com
+;; Everything between `;;; Commentary:' and `;;; Code' will be
+;; parsed. See make-readme-markdown.el for an example (you might
+;; already be looking at it... whoa, this is really getting meta...).
+;;
+;; If there's some more syntax you would like to see supported, submit
+;; an issue at https://github.com/mgalgs/make-readme-markdown/issues
 ;;
 ;;; Code
 
