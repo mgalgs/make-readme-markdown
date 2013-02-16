@@ -92,9 +92,8 @@
 
      ;; code line (starts with "`")
      ((string-match "^`" stripped-line)
-      (let ((line (concat "    `"
-                          (trim-string (nth 1 (split-string stripped-line "`")))
-                          "`")))
+      (let ((line (concat "    "
+                          (trim-string (nth 1 (split-string stripped-line "`"))))))
         (princ line)))
 
      ;; default (just print it)
@@ -106,7 +105,8 @@
 ;; eo print-formatted-line
 
 ;; process the input:
-(let (line (started-output nil))
+(let (line
+      (started-output nil))
   (catch 'break
     (while (setq line (read-from-minibuffer ""))
       ;; we've reached the end when we see "Code" all by itself:
