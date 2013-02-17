@@ -13,7 +13,8 @@ Use
 ===
 
 Invoke this elisp file with emacs --script like so:
-    `$ emacs --script make-readme-markdown.el < elisp-file-to-parse.el`
+
+    $ emacs --script make-readme-markdown.el < elisp-file-to-parse.el
 
 (Note: you might have to redirect stderr to `/dev/null` to avoid
 some pesky "loading vc-git" messages and the like...)
@@ -30,15 +31,29 @@ In order for this module to do you any good, you should write your
 file header comments in a way that make-readme-markdown.el
 understands. An attempt has been made to support the most common
 file header comment style, so hopefully you shouldn't have to do
-anything...
+anything... The following patterns at the beginning of a line are
+special:
 
-* ';;;' at the beginning of a line for a header.
-* ';;`' at the beginning of a line for a code line.
-* 'o' at the beginning of a line for a list item
+* ';;; My Header' :: Creates a header
+* ';;` ' :: Creates a code line (deprecated, see markdown notes below)
+* ';; o My list item' :: Creates a list item
 
-Everything between `;;; Commentary:' and `;;; Code' will be
-parsed. See make-readme-markdown.el for an example (you might
-already be looking at it... whoa, this is really getting meta...).
+Everything else is stripped of its leading semicolons and first
+space and is passed directly out. Note that you can embed markdown
+syntax directly in your comments. This means that you can embed
+blocks of code in your comments by leading the line with 4 spaces
+(in addition to the first space directly following the last
+semicolon). An example:
+
+My code example:
+
+    (defun strip-comments (line)
+      "Stip elisp comments from line"
+      (replace-regexp-in-string "^;+ ?" "" line))
+
+We parse everything between `;;; Commentary:' and `;;; Code'. See
+make-readme-markdown.el for an example (you might already be
+looking at it... whoa, this is really getting meta...).
 
 If there's some more syntax you would like to see supported, submit
 an issue at https://github.com/mgalgs/make-readme-markdown/issues

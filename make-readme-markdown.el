@@ -32,7 +32,8 @@
 ;;; Use:
 ;;
 ;; Invoke this elisp file with emacs --script like so:
-;;`   $ emacs --script make-readme-markdown.el < elisp-file-to-parse.el
+;;
+;;     $ emacs --script make-readme-markdown.el < elisp-file-to-parse.el
 ;;
 ;; (Note: you might have to redirect stderr to `/dev/null` to avoid
 ;; some pesky "loading vc-git" messages and the like...)
@@ -48,15 +49,29 @@
 ;; file header comments in a way that make-readme-markdown.el
 ;; understands. An attempt has been made to support the most common
 ;; file header comment style, so hopefully you shouldn't have to do
-;; anything...
+;; anything... The following patterns at the beginning of a line are
+;; special:
 ;;
-;; o ';;;' at the beginning of a line for a header.
-;; o ';;`' at the beginning of a line for a code line.
-;; o 'o' at the beginning of a line for a list item
+;; o ';;; My Header' :: Creates a header
+;; o ';;` ' :: Creates a code line (deprecated, see markdown notes below)
+;; o ';; o My list item' :: Creates a list item
 ;;
-;; Everything between `;;; Commentary:' and `;;; Code' will be
-;; parsed. See make-readme-markdown.el for an example (you might
-;; already be looking at it... whoa, this is really getting meta...).
+;; Everything else is stripped of its leading semicolons and first
+;; space and is passed directly out. Note that you can embed markdown
+;; syntax directly in your comments. This means that you can embed
+;; blocks of code in your comments by leading the line with 4 spaces
+;; (in addition to the first space directly following the last
+;; semicolon). An example:
+;;
+;; My code example:
+;;
+;;     (defun strip-comments (line)
+;;       "Stip elisp comments from line"
+;;       (replace-regexp-in-string "^;+ ?" "" line))
+;;
+;; We parse everything between `;;; Commentary:' and `;;; Code'. See
+;; make-readme-markdown.el for an example (you might already be
+;; looking at it... whoa, this is really getting meta...).
 ;;
 ;; If there's some more syntax you would like to see supported, submit
 ;; an issue at https://github.com/mgalgs/make-readme-markdown/issues
@@ -66,7 +81,7 @@
 
 (defun strip-comments (line)
   "Stip elisp comments from line"
-  (trim-string (replace-regexp-in-string "^;+" "" line)))
+  (replace-regexp-in-string "^;+ ?" "" line))
 
 (defun trim-string (line)
   "Trim spaces from beginning and end of string"
@@ -78,8 +93,8 @@
   (let ((stripped-line (strip-comments line)))
     (cond
 
-     ;; Header line (starts with ";;;")
-     ((string-match "^;;;" line)
+     ;; Header line (starts with ";;; ")
+     ((string-match "^;;; " line)
       (let ((line (car (split-string stripped-line ":"))))
         (princ line)
         (princ "\n")
