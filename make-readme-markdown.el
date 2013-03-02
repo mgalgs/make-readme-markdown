@@ -1,39 +1,53 @@
-;;; make-readme-markdown.el --- Convert header section of elisp file
-;;; to markdown text, suitable for a github README.md file
+;;; make-readme-markdown.el --- Convert emacs lisp documentation to markdown
 
 ;; Copyright (C) 2011, Mitchel Humpherys
+;; Copyright (C) 2013, Justine Tunney
 
 ;; Author: Mitchel Humpherys <mitch.special@gmail.com>
-;; Keywords: convenience
+;; Keywords: tools, convenience
 ;; Version: 0.1
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
 ;; (at your option) any later version.
-
+;;
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
-
+;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;;
-;; Easily convert elisp file headers to markdown text. The file
-;; comment headers should be similar to this one.
-;;
+
+;; This tool will let you easily convert elisp file headers to markdown text so
+;; long as the file comments and documentation follow standard conventions
+;; (like this file). This is because when you're writing an elisp module, the
+;; module itself should be the canonical source of documentation. But it's not
+;; very user-friendly or good marketing for your project to have an empty
+;; README.md that refers people to your source code, and it's even worse if you
+;; have to maintain two separate files that say the same thing.
+
 ;;; Installation:
-;;
+
 ;; None
-;;
-;;; Use:
-;;
+
+;;; Usage:
+
 ;; Invoke this elisp file with emacs --script like so:
 ;;
 ;;     $ emacs --script make-readme-markdown.el < elisp-file-to-parse.el
+;;
+;; But the easiest way to use this tool is by putting the following code in
+;; your Makefile and running `make README.md`:
+;;
+;;     README.md: make-readme-markdown.el YOUR-MODULE.el
+;;     	emacs --script $< <YOUR-MODULE.el >$@
+;;     make-readme-markdown.el:
+;;     	wget https://raw.github.com/mgalgs/make-readme-markdown/master/make-readme-markdown.el
+;;     .INTERMEDIATE: make-readme-markdown.el
 ;;
 ;; (Note: you might have to redirect stderr to `/dev/null` to avoid
 ;; some pesky "loading vc-git" messages and the like...)
@@ -75,9 +89,10 @@
 ;;
 ;; If there's some more syntax you would like to see supported, submit
 ;; an issue at https://github.com/mgalgs/make-readme-markdown/issues
-;;
-;;; Code
 
+;;; Code:
+
+(setq case-fold-search t)  ;; Ignore case in regexps.
 
 (defun strip-comments (line)
   "Stip elisp comments from line"
@@ -92,6 +107,23 @@
   "Fix refs like `this' so they don't turn adjacent text into code."
   (replace-regexp-in-string "`[^`\t ]+\\('\\)" "`" line nil nil 1))
 
+(defun print-section (line char)
+  "Prints a markdown section using the underline syntax."
+  (setq line (replace-regexp-in-string ":?[ \t]*$" "" line))
+  (setq line (replace-regexp-in-string " --- " " – " line))
+  (princ line)
+  (princ "\n")
+  (princ (make-string (length line) char)))
+
+(defun slurp ()
+  "Read all text from stdin as list of lines"
+  (let (line lines)
+    (condition-case nil
+        (while (setq line (read-from-minibuffer ""))
+          (setq lines (cons line lines)))
+      (error nil))
+    (reverse lines)))
+
 (defun print-formatted-line (line)
   "Prints a line formatted as markdown."
   (setq line (fix-symbol-references line))
@@ -100,10 +132,7 @@
 
      ;; Header line (starts with ";;; ")
      ((string-match "^;;; " line)
-      (let ((line (car (split-string stripped-line ":"))))
-        (princ line)
-        (princ "\n")
-        (princ (make-string (length line) ?=))))
+      (print-section stripped-line ?-))
 
      ;; list line (starts with " o ")
      ((string-match "^ *o " stripped-line)
@@ -126,15 +155,27 @@
 
 ;; process the input:
 (let ((line nil)
-      (started-output nil)
-      (case-fold-search t))
+      (title nil)
+      (lines (slurp))
+      (started-output nil))
+  ;; The first line should be like ";;; lol.el --- does stuff".
+  (while (if (string-match "^;;;" (car lines))
+             (setq title (concat title (strip-comments (car lines)) " ")
+                   lines (cdr lines))))
+  (when title
+    (print-section title ?=)
+    (princ "\n"))
+  ;; Process everything else.
   (catch 'break
-    (while (setq line (read-from-minibuffer ""))
-      ;; we've reached the end when we see "Code" all by itself:
-      (if (string-match "^;;; Code:?$" line) (throw 'break nil))
-      (if (string-match "^;;; Commentary:?$" line) (setq started-output t))
-      (if started-output (print-formatted-line line)))))
-
+    (while (setq line (car lines))
+      (cond
+       ((string-match "^;;; Code:?$" line)
+        (throw 'break nil))
+       ((string-match "^;;; Commentary:?$" line)
+        (setq started-output t))
+       (started-output
+        (print-formatted-line line)))
+      (setq lines (cdr lines)))))
 
 ;; default command line options:
 ;; (setq got-no-spam nil)
@@ -146,7 +187,10 @@
 ;; parse the commad line:
 ;; (command-line)
 
-(princ "<div style=\"padding-top:15px;color: #d0d0d0;\">
+(princ "-----
+<div style=\"padding-top:15px;color: #d0d0d0;\">
 Markdown README file generated by
 <a href=\"https://github.com/mgalgs/make-readme-markdown\">make-readme-markdown.el</a>
 </div>\n")
+
+;;; make-readme-markdown.el ends here
