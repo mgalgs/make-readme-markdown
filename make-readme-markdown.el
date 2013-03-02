@@ -88,8 +88,13 @@
   (replace-regexp-in-string " +$" ""
                             (replace-regexp-in-string "^ +" "" line)))
 
+(defun fix-symbol-references (line)
+  "Fix refs like `this' so they don't turn adjacent text into code."
+  (replace-regexp-in-string "`[^`\t ]+\\('\\)" "`" line nil nil 1))
+
 (defun print-formatted-line (line)
   "Prints a line formatted as markdown."
+  (setq line (fix-symbol-references line))
   (let ((stripped-line (strip-comments line)))
     (cond
 
