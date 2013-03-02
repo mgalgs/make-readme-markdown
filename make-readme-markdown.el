@@ -120,13 +120,14 @@
 ;; eo print-formatted-line
 
 ;; process the input:
-(let (line
-      (started-output nil))
+(let ((line nil)
+      (started-output nil)
+      (case-fold-search t))
   (catch 'break
     (while (setq line (read-from-minibuffer ""))
       ;; we've reached the end when we see "Code" all by itself:
-      (if (string= "Code" (strip-comments line)) (throw 'break nil))
-      (if (string= "Commentary:" (strip-comments line)) (setq started-output t))
+      (if (string-match "^;;; Code:?$" line) (throw 'break nil))
+      (if (string-match "^;;; Commentary:?$" line) (setq started-output t))
       (if started-output (print-formatted-line line)))))
 
 
