@@ -27,7 +27,7 @@ repository!):
     	wget -q -O $@ https://raw.github.com/mgalgs/make-readme-markdown/master/make-readme-markdown.el
     .INTERMEDIATE: make-readme-markdown.el
 
-You can also invoke it directly file with `emacs --script`:
+You can also invoke it directly with `emacs --script`:
 
     $ emacs --script make-readme-markdown.el <elisp-file-to-parse.el 2>/dev/null
 
@@ -48,8 +48,8 @@ special:
 * `;;; My Header` :: Creates a header
 * `;;` ' :: Creates a code line (deprecated, see markdown notes below)
 * `;; o My list item` :: Creates a list item
-* `;; * My list item` :: Als creates a list item
-* `;; - My list item` :: Als creates a list item
+* `;; * My list item` :: Also creates a list item
+* `;; - My list item` :: Also creates a list item
 
 Everything else is stripped of its leading semicolons and first
 space and is passed directly out. Note that you can embed markdown
