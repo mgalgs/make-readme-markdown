@@ -72,31 +72,31 @@ an issue at https://github.com/mgalgs/make-readme-markdown/issues
 Function Documentation
 ----------------------
 
-### (strip-comments LINE)
+### `(strip-comments LINE)`
 
 Stip elisp comments from line
 
-### (trim-string LINE)
+### `(trim-string LINE)`
 
 Trim spaces from beginning and end of string
 
-### (fix-symbol-references LINE)
+### `(fix-symbol-references LINE)`
 
 Fix refs like `this` so they don't turn adjacent text into code.
 
-### (print-section LINE CHAR)
+### `(print-section LINE CHAR)`
 
 Prints a markdown section using the underline syntax.
 
-### (slurp)
+### `(slurp)`
 
 Read all text from stdin as list of lines
 
-### (print-formatted-line LINE)
+### `(print-formatted-line LINE)`
 
 Prints a line formatted as markdown.
 
-### (document-a-function)
+### `(document-a-function)`
 
 Searches for next defun/macro and print markdown documentation.
 

@@ -167,10 +167,19 @@
                    (eval (read (format "(function %s)" func))))))
         (if (and (not (string-match "Not documented\\." text))
                  (string-match "(" text))
-            (princ (fix-symbol-references
-                    (concat "### "
-                            (substring text (match-beginning 0))
-                            "\n\n"))))))))
+            (with-temp-buffer
+              (insert text)
+              (goto-char (match-beginning 0))
+              (forward-line)
+              (let* ((title-txt (buffer-substring (point)
+                                                  (line-end-position)))
+                     (rest (buffer-substring (line-beginning-position 2)
+                                             (point-max)))
+                     (cleaned-rest (fix-symbol-references rest))
+                     (printable (format "### `%s`\n%s\n\n"
+                                        title-txt
+                                        cleaned-rest)))
+                (princ printable))))))))
 
 (let* ((line nil)
        (title nil)
