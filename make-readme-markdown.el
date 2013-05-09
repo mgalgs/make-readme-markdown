@@ -104,13 +104,16 @@
   "Fix refs like `this' so they don't turn adjacent text into code."
   (replace-regexp-in-string "`[^`\t ]+\\('\\)" "`" line nil nil 1))
 
-(defun print-section (line char)
-  "Prints a markdown section using the underline syntax."
+(defun make-section (line level)
+  "Makes a markdown section using the underline syntax."
   (setq line (replace-regexp-in-string ":?[ \t]*$" "" line))
   (setq line (replace-regexp-in-string " --- " " – " line))
-  (princ line)
-  (princ "\n")
-  (princ (make-string (length line) char)))
+  (format "%s %s" (make-string level ?#) line))
+
+(defun print-section (line level)
+  "Prints a section made with `make-section'."
+  (princ (make-section line level))
+  (princ "\n"))
 
 (defun slurp ()
   "Read all text from stdin as list of lines"
@@ -129,7 +132,7 @@
 
      ;; Header line (starts with ";;; ")
      ((string-match "^;;; " line)
-      (print-section stripped-line ?-))
+      (print-section stripped-line 3))
 
      ;; list line (starts with " o ")
      ((string-match "^ *o " stripped-line)
@@ -176,9 +179,10 @@
                      (rest (buffer-substring (line-beginning-position 2)
                                              (point-max)))
                      (cleaned-rest (fix-symbol-references rest))
-                     (printable (format "### `%s`\n%s\n\n"
-                                        title-txt
-                                        cleaned-rest)))
+                     (printable (make-section (format "`%s`\n%s\n\n"
+						      title-txt
+						      cleaned-rest)
+					      4)))
                 (princ printable))))))))
 
 (let* ((line nil)
@@ -193,7 +197,7 @@
              (setq title (concat title (strip-comments (car lines)) " ")
                    lines (cdr lines))))
   (when title
-    (print-section title ?=)
+    (print-section title 2)
     (princ "\n"))
 
   ;; Process everything else.
@@ -207,7 +211,7 @@
 
        ;; Once we hit code, attempt to document functions/macros.
        ((string-match "^;;; Code:?$" line)
-        (print-section "Function Documentation" ?-)
+        (print-section "Function Documentation" 3)
         (princ "\n\n")
         (with-temp-buffer
           (insert code)

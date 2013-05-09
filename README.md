@@ -1,5 +1,5 @@
-make-readme-markdown.el – Convert emacs lisp documentation to markdown
-======================================================================
+## make-readme-markdown.el – Convert emacs lisp documentation to markdown
+
 
 This tool will let you easily convert elisp file headers to markdown text so
 long as the file comments and documentation follow standard conventions
@@ -9,13 +9,13 @@ very user-friendly or good marketing for your project to have an empty
 README.md that refers people to your source code, and it's even worse if you
 have to maintain two separate files that say the same thing.
 
-Installation
-------------
+### Installation
+
 
 None
 
-Usage
------
+### Usage
+
 
 The recommended way to use this tool is by putting the following code in
 your Makefile and running `make README.md` (You don't even have to clone the
@@ -35,8 +35,8 @@ All functions and macros in your module with docstrings will be documented
 in the output unless they've been marked as private. Convention dictates
 that private elisp functions have two hypens, like `cup--noodle`.
 
-Syntax
-------
+### Syntax
+
 
 In order for this module to do you any good, you should write your
 file header comments in a way that make-readme-markdown.el
@@ -69,34 +69,38 @@ looking at it... whoa, this is really getting meta...).
 If there's some more syntax you would like to see supported, submit
 an issue at https://github.com/mgalgs/make-readme-markdown/issues
 
-Function Documentation
-----------------------
+### Function Documentation
 
-### `(strip-comments LINE)`
+
+#### `(strip-comments LINE)`
 
 Stip elisp comments from line
 
-### `(trim-string LINE)`
+#### `(trim-string LINE)`
 
 Trim spaces from beginning and end of string
 
-### `(fix-symbol-references LINE)`
+#### `(fix-symbol-references LINE)`
 
 Fix refs like `this` so they don't turn adjacent text into code.
 
-### `(print-section LINE CHAR)`
+#### `(make-section LINE LEVEL)`
 
-Prints a markdown section using the underline syntax.
+Makes a markdown section using the underline syntax.
 
-### `(slurp)`
+#### `(print-section LINE LEVEL)`
+
+Prints a section made with `make-section`.
+
+#### `(slurp)`
 
 Read all text from stdin as list of lines
 
-### `(print-formatted-line LINE)`
+#### `(print-formatted-line LINE)`
 
 Prints a line formatted as markdown.
 
-### `(document-a-function)`
+#### `(document-a-function)`
 
 Searches for next defun/macro and print markdown documentation.
 
