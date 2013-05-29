@@ -1,5 +1,5 @@
 ## make-readme-markdown.el
-*Convert emacs lisp documentation to markdown*
+*Convert emacs lisp documentation to markdown all day every day*
 
 ---
 

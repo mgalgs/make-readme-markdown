@@ -1,4 +1,5 @@
-;;; make-readme-markdown.el --- Convert emacs lisp documentation to markdown
+;;; make-readme-markdown.el --- Convert emacs lisp documentation to
+;;; markdown all day every day
 
 ;; Copyright (C) 2011, Mitchel Humpherys
 ;; Copyright (C) 2013, Justine Tunney
@@ -194,7 +195,9 @@
 
   ;; The first line should be like ";;; lol.el --- does stuff".
   (while (if (string-match "^;;;" (car lines))
-             (setq title (concat title (strip-comments (car lines)))
+             (setq title (concat title
+                                 (strip-comments (car lines))
+                                 (if title "" " "))
                    lines (cdr lines))))
   (when title
     (let ((title-parts (split-string title " --- ")))
