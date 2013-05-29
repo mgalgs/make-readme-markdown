@@ -105,7 +105,7 @@
   (replace-regexp-in-string "`[^`\t ]+\\('\\)" "`" line nil nil 1))
 
 (defun make-section (line level)
-  "Makes a markdown section using the underline syntax."
+  "Makes a markdown section using the `#' syntax."
   (setq line (replace-regexp-in-string ":?[ \t]*$" "" line))
   (setq line (replace-regexp-in-string " --- " " – " line))
   (format "%s %s" (make-string level ?#) line))

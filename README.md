@@ -86,7 +86,7 @@ Fix refs like `this` so they don't turn adjacent text into code.
 
 #### `(make-section LINE LEVEL)`
 
-Makes a markdown section using the underline syntax.
+Makes a markdown section using the `#` syntax.
 
 #### `(print-section LINE LEVEL)`
 
