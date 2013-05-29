@@ -194,11 +194,14 @@
 
   ;; The first line should be like ";;; lol.el --- does stuff".
   (while (if (string-match "^;;;" (car lines))
-             (setq title (concat title (strip-comments (car lines)) " ")
+             (setq title (concat title (strip-comments (car lines)))
                    lines (cdr lines))))
   (when title
-    (print-section title 2)
-    (princ "\n"))
+    (let ((title-parts (split-string title " --- ")))
+      (print-section (car title-parts) 2)
+      (when (cdr title-parts)
+        (princ (format "*%s*\n\n" (cadr title-parts))))
+      (princ "---\n")))
 
   ;; Process everything else.
   (catch 'break

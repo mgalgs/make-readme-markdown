@@ -1,5 +1,7 @@
-## make-readme-markdown.el – Convert emacs lisp documentation to markdown
+## make-readme-markdown.el
+*Convert emacs lisp documentation to markdown*
 
+---
 
 This tool will let you easily convert elisp file headers to markdown text so
 long as the file comments and documentation follow standard conventions
