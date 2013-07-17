@@ -180,10 +180,10 @@
                      (rest (buffer-substring (line-beginning-position 2)
                                              (point-max)))
                      (cleaned-rest (fix-symbol-references rest))
-                     (printable (make-section (format "`%s`\n%s\n\n"
-						      title-txt
-						      cleaned-rest)
-					      4)))
+                     (printable (concat (make-section (format "`%s`" title-txt) 4)
+                                        "\n"
+                                        cleaned-rest
+                                        "\n\n")))
                 (princ printable))))))))
 
 (let* ((line nil)
