@@ -188,6 +188,7 @@
 
 (let* ((line nil)
        (title nil)
+       (title-lines)
        (lines (slurp))
        (started-output nil)
        (code-mode nil)
@@ -195,11 +196,15 @@
 
   ;; The first line should be like ";;; lol.el --- does stuff".
   (while (if (string-match "^;;;" (car lines))
-             (setq title (concat title
-                                 (strip-comments (car lines))
-                                 (if title "" " "))
+             (setq title-lines (cons (strip-comments (car lines))
+                                     title-lines)
                    lines (cdr lines))))
-  (when title
+
+  (setq title (mapconcat 'identity
+                         (reverse title-lines)
+                         " "))
+
+  (unless (string= title "")
     (let ((title-parts (split-string title " --- ")))
       (print-section (car title-parts) 2)
       (when (cdr title-parts)
