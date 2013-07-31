@@ -65,7 +65,6 @@
 ;; special:
 ;;
 ;; o `;;; My Header` :: Creates a header
-;; o `;;` ' :: Creates a code line (deprecated, see markdown notes below)
 ;; o `;; o My list item` :: Creates a list item
 ;; o `;; * My list item` :: Also creates a list item
 ;; o `;; - My list item` :: Also creates a list item
@@ -138,12 +137,6 @@
      ;; list line (starts with " o ")
      ((string-match "^ *o " stripped-line)
       (let ((line (replace-regexp-in-string "^ *\o" "*" stripped-line)))
-        (princ line)))
-
-     ;; code line (starts with "`")
-     ((string-match "^`" stripped-line)
-      (let ((line (concat "    "
-                          (trim-string (nth 1 (split-string stripped-line "`"))))))
         (princ line)))
 
      ;; default (just print it)
