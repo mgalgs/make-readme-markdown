@@ -65,7 +65,7 @@ semicolon). For example:
       "Stip elisp comments from line"
       (replace-regexp-in-string "^;+ ?" "" line))
 
-We parse everything between `;;; Commentary:' and `;;; Code'. See
+We parse everything between `;;; Commentary:` and `;;; Code`. See
 make-readme-markdown.el for an example (you might already be
 looking at it... whoa, this is really getting meta...).
 
