@@ -11,6 +11,7 @@ users=(
     https://raw.githubusercontent.com/mgalgs/top-o-the-mornin-mode/master/top-o-the-mornin.el
     https://raw.githubusercontent.com/mgalgs/diffview-mode/master/diffview.el
     https://raw.githubusercontent.com/mgalgs/indent-hints-mode/master/indent-hints.el
+    https://raw.githubusercontent.com/mgalgs/jumbobuffer/master/jumbobuffer.el
     https://raw.githubusercontent.com/jart/includeme/master/includeme.el
     https://raw.githubusercontent.com/jart/disaster/master/disaster.el
 )
