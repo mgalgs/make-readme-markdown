@@ -43,8 +43,10 @@
 ;;
 ;;     README.md: make-readme-markdown.el YOUR-MODULE.el
 ;;     	emacs --script $< <YOUR-MODULE.el >$@ 2>/dev/null
+;;
 ;;     make-readme-markdown.el:
 ;;     	wget -q -O $@ https://raw.github.com/mgalgs/make-readme-markdown/master/make-readme-markdown.el
+;;
 ;;     .INTERMEDIATE: make-readme-markdown.el
 ;;
 ;; You can also invoke it directly with `emacs --script`:
@@ -168,13 +170,14 @@
               (insert text)
               (goto-char (match-beginning 0))
               (forward-line)
-              (let* ((title-txt (buffer-substring (point)
-                                                  (line-end-position)))
-                     (rest (buffer-substring (line-beginning-position 2)
+              (let* ((title-txt (replace-regexp-in-string "\n"
+                                                          ""
+                                                          (buffer-substring (point)
+                                                                            (progn (forward-sexp) (point)))))
+                     (rest (buffer-substring (point)
                                              (point-max)))
                      (cleaned-rest (fix-symbol-references rest))
                      (printable (concat (make-section (format "`%s`" title-txt) 4)
-                                        "\n"
                                         cleaned-rest
                                         "\n\n")))
                 (princ printable))))))))

@@ -25,8 +25,10 @@ repository!):
 
     README.md: make-readme-markdown.el YOUR-MODULE.el
     	emacs --script $< <YOUR-MODULE.el >$@ 2>/dev/null
+
     make-readme-markdown.el:
     	wget -q -O $@ https://raw.github.com/mgalgs/make-readme-markdown/master/make-readme-markdown.el
+
     .INTERMEDIATE: make-readme-markdown.el
 
 You can also invoke it directly with `emacs --script`:
@@ -48,7 +50,6 @@ anything... The following patterns at the beginning of a line are
 special:
 
 * `;;; My Header` :: Creates a header
-* `;;` ' :: Creates a code line (deprecated, see markdown notes below)
 * `;; o My list item` :: Creates a list item
 * `;; * My list item` :: Also creates a list item
 * `;; - My list item` :: Also creates a list item
