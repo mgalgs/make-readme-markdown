@@ -18,10 +18,11 @@ users=(
 
 echo "Running regression tests..."
 
+git show origin/master:./make-readme-markdown.el > baseline.el
+
 for user in ${users[*]}; do
     curl -s $user > testfile || { echo "Couldn't download $user. Skipping."; continue; }
     emacs --script make-readme-markdown.el < testfile > testfile.md.before 2>/dev/null
-    git show origin/master:./make-readme-markdown.el > baseline.el
     emacs --script baseline.el < testfile > testfile.md.after 2>/dev/null
     basename=${user##*/}
     if ! diff testfile.md.before testfile.md.after > $basename.diff; then
