@@ -79,9 +79,15 @@ a blank line and 8 spaces. For example:
 * I like bananas
 * I like pizza
 
-        (eat (make-pizza))
+        (eat (make-pizza "pepperoni"))
 
-* I like ice cream
+* I like ice cream with pretty syntax highlighting
+
+```elisp
+(eat (make-ice-cream "vanilla"))
+```
+
+* I need to go for a run
 
 We parse everything between `;;; Commentary:` and `;;; Code`. See
 make-readme-markdown.el for an example (you might already be

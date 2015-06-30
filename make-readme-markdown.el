@@ -96,9 +96,15 @@
 ;; o I like bananas
 ;; o I like pizza
 ;;
-;;         (eat (make-pizza))
+;;         (eat (make-pizza "pepperoni"))
 ;;
-;; o I like ice cream
+;; o I like ice cream with pretty syntax highlighting
+;;
+;; ```elisp
+;; (eat (make-ice-cream "vanilla"))
+;; ```
+;;
+;; o I need to go for a run
 ;;
 ;; We parse everything between `;;; Commentary:` and `;;; Code`. See
 ;; make-readme-markdown.el for an example (you might already be
