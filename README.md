@@ -51,8 +51,8 @@ special:
 
 * `;;; My Header` :: Creates a header
 * `;; o My list item` :: Creates a list item
-* `;; * My list item` :: Also creates a list item
-* `;; - My list item` :: Also creates a list item
+* `;; * My list item` :: Creates a list item
+* `;; - My list item` :: Creates a list item
 
 Everything else is stripped of its leading semicolons and first
 space and is passed directly out. Note that you can embed markdown
