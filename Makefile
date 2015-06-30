@@ -7,3 +7,5 @@ README.md: make-readme-markdown.el
 
 test: test.sh
 	./test.sh
+
+.PHONY: README.md
