@@ -82,6 +82,16 @@
 ;;       "Stip elisp comments from line"
 ;;       (replace-regexp-in-string "^;+ ?" "" line))
 ;;
+;; Remember, if you want to indent code within a list item you need to use
+;; a blank line and 8 spaces. For example:
+;;
+;; o I like bananas
+;; o I like pizza
+;;
+;;         (eat (make-pizza))
+;;
+;; o I like ice cream
+;;
 ;; We parse everything between `;;; Commentary:` and `;;; Code`. See
 ;; make-readme-markdown.el for an example (you might already be
 ;; looking at it... whoa, this is really getting meta...).
