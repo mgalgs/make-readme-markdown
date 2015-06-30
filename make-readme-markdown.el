@@ -82,6 +82,14 @@
 ;;       "Stip elisp comments from line"
 ;;       (replace-regexp-in-string "^;+ ?" "" line))
 ;;
+;; Or you can use the triple-backtic+lang approach, like so:
+;;
+;; ```elisp
+;; (defun strip-comments (line)
+;;   "Stip elisp comments from line"
+;;   (replace-regexp-in-string "^;+ ?" "" line))
+;; ```
+;;
 ;; Remember, if you want to indent code within a list item you need to use
 ;; a blank line and 8 spaces. For example:
 ;;
