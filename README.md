@@ -2,6 +2,7 @@
 *Convert emacs lisp documentation to markdown all day every day*
 
 ---
+[![License GPLv3](https://img.shields.io/badge/license-GPL_v3-green.svg)](http://www.gnu.org/licenses/gpl-3.0.html)
 
 This tool will let you easily convert elisp file headers to markdown text so
 long as the file comments and documentation follow standard conventions
@@ -130,6 +131,17 @@ Prints a line formatted as markdown.
 #### `(document-a-function)`
 
 Searches for next defun/macro and print markdown documentation.
+
+#### `(squeeze-spaces TXT)`
+
+Coalesce whitespace.
+
+#### `(print-badges LINES)`
+
+Print badges for license, package repo, etc.
+
+Tries to parse a license from the comments, printing a badge for
+any license found.
 
 -----
 <div style="padding-top:15px;color: #d0d0d0;">

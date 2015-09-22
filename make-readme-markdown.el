@@ -1,7 +1,7 @@
 ;;; make-readme-markdown.el --- Convert emacs lisp documentation to
 ;;; markdown all day every day
 
-;; Copyright (C) 2011, Mitchel Humpherys
+;; Copyright (C) 2011-2015, Mitchel Humpherys
 ;; Copyright (C) 2013, Justine Tunney
 
 ;; Author: Mitchel Humpherys <mitch.special@gmail.com>
@@ -116,6 +116,7 @@
 ;;; Code:
 
 (setq case-fold-search t)  ;; Ignore case in regexps.
+(setq debug-on-error t)
 
 (defun strip-comments (line)
   "Stip elisp comments from line"
@@ -206,6 +207,57 @@
                                         "\n\n")))
                 (princ printable))))))))
 
+(defun mrm--select (lst pred)
+  "Filter `lst'.
+
+Keeps items for whom `pred' returns non-nil."
+  (delq nil
+        (mapcar (lambda (el) (when (funcall pred el) el))
+                lst)))
+
+(defvar license-texts '(("MIT" . "The MIT License (MIT).*Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software\\. THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT\\. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE\\.")
+                        ("GPLv2" . "This .* is free software.* you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation.* either version 2.*, or (at your option) any later version\\. This .* is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE\\.  See the GNU General Public License for more details\\. You should have received a copy of the GNU General Public License along with this .* if not, write to the Free Software Foundation")
+                        ("GPLv3" . "This .* is free software.* you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version\\. This .* is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE\\.  See the GNU General Public License for more details\\. You should have received a copy of the GNU General Public License along with .*  If not, see <http://www\\.gnu\\.org/licenses/>\\.")
+                        ("BSD" . "Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:.*Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.*Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution\\. .*Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission\\. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED\\. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE\\.")
+                        ("Apachev2" . "Licensed under the Apache License, Version 2\\.0 (the \"License\"); you may not use this file except in compliance with the License. You may obtain a copy of the License at.*http://www\\.apache\\.org/licenses/LICENSE-2\\.0.*Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an \"AS IS\" BASIS,WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied\\. See the License for the specific language governing permissions and limitations under the License\\.")))
+
+(defvar license-badges '(("MIT" . "[![License MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)")
+                         ("GPLv2" . "[![License GPLv2](https://img.shields.io/badge/license-GPL_v2-green.svg)](http://www.gnu.org/licenses/gpl-2.0.html)")
+                         ("GPLv3" . "[![License GPLv3](https://img.shields.io/badge/license-GPL_v3-green.svg)](http://www.gnu.org/licenses/gpl-3.0.html)")
+                         ("BSD" . "[![License BSD](https://img.shields.io/badge/license-BSD-green.svg)](http://opensource.org/licenses/BSD-3-Clause)")
+                         ("Apachev2" . "[![License Apache v2](https://img.shields.io/badge/license-Apache_v2-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)")))
+
+(defun squeeze-spaces (txt)
+  "Coalesce whitespace."
+  (replace-regexp-in-string "[\n[:space:]]+" " " txt))
+
+(defun get-all-comments-single-line (lines)
+  (with-temp-buffer
+    (insert (mapconcat 'identity
+                       (mrm--select lines
+                                    (lambda (el) (string-match-p "^[[:space:]]*;" el)))
+                       "\n"))
+    (let ((comment-start ";")) (uncomment-region 0 (point-max)))
+    (downcase (squeeze-spaces (buffer-string)))))
+
+(defun print-badges (lines)
+  "Print badges for license, package repo, etc.
+
+Tries to parse a license from the comments, printing a badge for
+any license found."
+  (let* ((comment-txt (get-all-comments-single-line lines))
+         (candidates (mrm--select license-texts (lambda (license)
+                                                  (string-match-p (downcase (squeeze-spaces (cdr license)))
+                                                                  comment-txt)))))
+    (cond
+     ((= (length candidates) 0)
+      (message "No license found"))
+     ((= (length candidates) 1)
+      (message "Found license: %s" (caar candidates))
+      (princ (format "%s\n" (cdr (assoc (caar candidates) license-badges)))))
+     (t
+      (message "Multiple licenses found: %s" candidates)))))
+
 (let* ((line nil)
        (title nil)
        (title-lines)
@@ -230,6 +282,8 @@
       (when (cdr title-parts)
         (princ (format "*%s*\n\n" (cadr title-parts))))
       (princ "---\n")))
+
+  (print-badges lines)
 
   ;; Process everything else.
   (catch 'break
@@ -261,6 +315,7 @@
         (print-formatted-line line)))
 
       (setq lines (cdr lines)))))
+
 (princ "-----
 <div style=\"padding-top:15px;color: #d0d0d0;\">
 Markdown README file generated by
