@@ -235,11 +235,10 @@ Keeps items for whom `pred' returns non-nil."
 
 (defun get-all-comments-single-line (lines)
   (with-temp-buffer
-    (insert (mapconcat 'identity
+    (insert (mapconcat (lambda (el) (replace-regexp-in-string "^[[:space:]]*;+" " " el))
                        (mrm--select lines
                                     (lambda (el) (string-match-p "^[[:space:]]*;" el)))
                        "\n"))
-    (let ((comment-start ";")) (uncomment-region 0 (point-max)))
     (downcase (squeeze-spaces (buffer-string)))))
 
 (defun print-badges (lines)
