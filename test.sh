@@ -25,24 +25,51 @@ users=(
     https://raw.githubusercontent.com/rranelli/simple-highlight/master/simple-highlight.el
 )
 
-echo "Running regression tests..."
+regression_test()
+{
+    echo "Running regression tests..."
 
-BEFORE=${BEFORE:-origin/master}
-git show ${BEFORE}:./make-readme-markdown.el > baseline.el
+    BEFORE=${BEFORE:-origin/master}
+    git show ${BEFORE}:./make-readme-markdown.el > baseline.el
 
-for user in ${users[*]}; do
-    curl -s $user > testfile || { echo "Couldn't download $user. Skipping."; continue; }
-    emacs --script make-readme-markdown.el < testfile > testfile.md.before 2>/dev/null
-    emacs --script baseline.el < testfile > testfile.md.after 2>/dev/null
-    basename=${user##*/}
-    if ! diff testfile.md.before testfile.md.after > $basename.diff; then
-        echo "$basename changed. Saved diff to $basename.diff"
-    else
-        echo "$basename OK"
-        rm $basename.diff
-    fi
-    rm testfile.md.{before,after}
-done
+    for user in ${users[*]}; do
+        curl -s $user > testfile || { echo "Couldn't download $user. Skipping."; continue; }
+        emacs --script make-readme-markdown.el < testfile > testfile.md.before 2>/dev/null
+        emacs --script baseline.el < testfile > testfile.md.after 2>/dev/null
+        basename=${user##*/}
+        if ! diff testfile.md.before testfile.md.after > $basename.diff; then
+            echo "$basename changed. Saved diff to $basename.diff"
+        else
+            echo "$basename OK"
+            rm $basename.diff
+        fi
+        rm testfile.md.{before,after}
+    done
 
-rm -f testfile
-rm -f baseline.el
+    rm -f testfile
+    rm -f baseline.el
+}
+
+update_clients()
+{
+    work=$(mktemp -d)
+    echo "Updating all repos in ${work}. [*] means it has changes."
+    cd $work
+    for user in ${users[*]}; do
+        repo=$(cut -d/ -f4-5 <<<$user)
+        echo -n "Updating ${repo}..."
+        git clone https://github.com/$repo &>/dev/null
+        (
+            cd $(basename $repo)
+            make README.md &>/dev/null
+            if git status --porcelain | grep -q README.md; then
+                echo " [*]"
+            else
+                echo
+            fi
+        )
+    done
+}
+
+[[ $1 == "update" ]] && { update_clients; exit $?; }
+regression_test
