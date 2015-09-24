@@ -18,7 +18,8 @@ users=(
 
 echo "Running regression tests..."
 
-git show origin/master:./make-readme-markdown.el > baseline.el
+BEFORE=${BEFORE:-origin/master}
+git show ${BEFORE}:./make-readme-markdown.el > baseline.el
 
 for user in ${users[*]}; do
     curl -s $user > testfile || { echo "Couldn't download $user. Skipping."; continue; }
