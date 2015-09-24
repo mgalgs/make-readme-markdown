@@ -8,12 +8,21 @@ users=(
     https://raw.githubusercontent.com/coldnew/ac-octave/master/ac-octave.el
     https://raw.githubusercontent.com/coldnew/pangu-spacing/master/pangu-spacing.el
     https://raw.githubusercontent.com/coldnew/linum-relative/master/linum-relative.el
+    https://raw.githubusercontent.com/coldnew/eshell-autojump/master/eshell-autojump.el
+    https://raw.githubusercontent.com/coldnew/org-remark/master/ox-remark.el
     https://raw.githubusercontent.com/mgalgs/top-o-the-mornin-mode/master/top-o-the-mornin.el
     https://raw.githubusercontent.com/mgalgs/diffview-mode/master/diffview.el
     https://raw.githubusercontent.com/mgalgs/indent-hints-mode/master/indent-hints.el
     https://raw.githubusercontent.com/mgalgs/jumbobuffer/master/jumbobuffer.el
     https://raw.githubusercontent.com/jart/includeme/master/includeme.el
     https://raw.githubusercontent.com/jart/disaster/master/disaster.el
+    https://raw.githubusercontent.com/jart/js2-closure/master/js2-closure.el
+    https://raw.githubusercontent.com/emacs-pe/pyimpsort.el/master/pyimpsort.el
+    https://raw.githubusercontent.com/emacs-pe/docean.el/master/docean.el
+    https://raw.githubusercontent.com/emacs-pe/jist.el/master/jist.el
+    https://raw.githubusercontent.com/emacs-pe/vagrant.el/master/vagrant.el
+    https://raw.githubusercontent.com/rranelli/auto-package-update.el/master/auto-package-update.el
+    https://raw.githubusercontent.com/rranelli/simple-highlight/master/simple-highlight.el
 )
 
 echo "Running regression tests..."
