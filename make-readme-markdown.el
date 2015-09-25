@@ -119,9 +119,21 @@
 
 (setq case-fold-search t)  ;; Ignore case in regexps.
 (setq debug-on-error t)
+(require 'json)
+
+(defvar melpa-recipes-json "http://melpa.org/recipes.json")
+
+(defun get-remote-url-as-string (url)
+  (with-current-buffer (url-retrieve-synchronously melpa-recipes-json t)
+    ;; remove http headers:
+    (delete-region 1 (re-search-forward "\r?\n\r?\n"))
+    (buffer-string)))
+
+(defun get-remote-url-as-json (url)
+  (json-read-from-string (get-remote-url-as-string url)))
 
 (defun strip-comments (line)
-  "Stip elisp comments from line"
+  "Strip elisp comments from line"
   (replace-regexp-in-string "^;+ ?" "" line))
 
 (defun trim-string (line)
@@ -241,11 +253,7 @@ Keeps items for whom `pred' returns non-nil."
                        "\n"))
     (downcase (squeeze-spaces (buffer-string)))))
 
-(defun print-badges (lines)
-  "Print badges for license, package repo, etc.
-
-Tries to parse a license from the comments, printing a badge for
-any license found."
+(defun print-license-badge (lines)
   (let* ((comment-txt (get-all-comments-single-line lines))
          (candidates (mrm--select license-texts (lambda (license)
                                                   (string-match-p (downcase (squeeze-spaces (cdr license)))
@@ -258,6 +266,47 @@ any license found."
       (princ (format "%s\n" (cdr (assoc (caar candidates) license-badges)))))
      (t
       (message "Multiple licenses found: %s" candidates)))))
+
+(defun get-file-headers (lines)
+  (let ((line (car lines)))
+    ((while (not (string-match-p "^;;; Commentary:?$" line))
+       (when (string-match ";; \\([^[:space:]]+\\): \\(.*\\)"
+                           line)
+         (setq headers (plist-put (intern (match-string 1))
+                                  (match-string 2))))
+       (setq lines (car lines))
+       (setq line (car lines))))))
+
+(defun print-melpa-badge (lines)
+  (let* ((headers (get-file-headers lines))
+         (package-url (plist-get plist 'Author))
+         repo-key repo-parts melpa-json package-json package-name)
+    (when (and package-url (string-prefix-p "https://github.com/" package-url))
+      (setq repo-parts (split-string package-url "/"))
+      (setq repo-key (format "%s/%s"
+                             (nth (- (length repo-parts) 2))
+                             (nth (- (length repo-parts) 1))))
+      (message "Searching for MELPA package using GitHub repo-key: %s..."
+               repo-key)
+     (setq melpa-json (get-remote-url-as-json melpa-recipes-json))
+      (setq package-json (mrm--select j (lambda (el)
+                                          (and (string= repo-key
+                                                        (cdr (assoc 'repo el)))
+                                               (string= "github"
+                                                        (cdr (assoc 'fetcher el)))))))
+      (when package-json
+        (setq package-name (caar package-json))
+        (princ (format "[![MELPA](http://melpa.org/packages/%s-badge.svg)](http://melpa.org/#/%s)"
+                       package-name
+                       package-name))))))
+
+(defun print-badges (lines)
+  "Print badges for license, package repo, etc.
+
+Tries to parse a license from the comments, printing a badge for
+any license found."
+  (print-license-badge lines)
+  (print-melpa-badge lines))
 
 (let* ((line nil)
        (title nil)
