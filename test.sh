@@ -53,7 +53,9 @@ regression_test()
 update_clients()
 {
     work=$(mktemp -d)
-    echo "Updating all repos in ${work}. [*] means it has changes."
+    echo "Updating all repos in ${work}."
+    echo "  [*] means it has changes"
+    echo "  [!] means there was an error rebuilding README.md"
     cd $work
     for user in ${users[*]}; do
         repo=$(cut -d/ -f4-5 <<<$user)
@@ -61,9 +63,13 @@ update_clients()
         git clone https://github.com/$repo &>/dev/null
         (
             cd $(basename $repo)
+            rm README.md
             make README.md &>/dev/null
+            ret=$?
+            [[ $ret -eq 0 ]] || { echo " [!]"; exit $ret; }
             if git status --porcelain | grep -q README.md; then
                 echo " [*]"
+                git commit -am 'README.md: Re-generate' >/dev/null
             else
                 echo
             fi
