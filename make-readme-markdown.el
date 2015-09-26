@@ -300,7 +300,7 @@ Keeps items for whom `pred' returns non-nil."
 (defun assoc-cdr (key list)
   (cdr (assoc key list)))
 
-(defun print-melpa-badge (package-url melpa-json melpa-base-url)
+(defun print-melpa-badge (package-url melpa-json melpa-base-url title)
   (let ((package-json (mrm--select melpa-json (lambda (el)
                                                 (string= package-url
                                                          (assoc-cdr 'url
@@ -310,7 +310,8 @@ Keeps items for whom `pred' returns non-nil."
     (when package-json
       (setq package-name (caar package-json))
       (message "Adding badge for %s for %s" melpa-base-url package-name)
-      (princ (format "[![MELPA](%s/packages/%s-badge.svg)](%s/#/%s)\n"
+      (princ (format "[![%s](%s/packages/%s-badge.svg)](%s/#/%s)\n"
+                     title
                      melpa-base-url
                      package-name
                      melpa-base-url
@@ -330,12 +331,14 @@ Keeps items for whom `pred' returns non-nil."
                repo-key)
       (print-melpa-badge package-url
                          (get-remote-url-as-json melpa-archive-json-url)
-                         "http://melpa.org")
+                         "http://melpa.org"
+                         "MELPA")
       (message "Searching for MELPA stable package using GitHub repo-key: %s..."
                repo-key)
       (print-melpa-badge package-url
                          (get-remote-url-as-json melpa-stable-archive-json-url)
-                         "http://stable.melpa.org"))))
+                         "http://stable.melpa.org"
+                         "MELPA Stable"))))
 
 (defun print-badges (lines)
   "Print badges for license, package repo, etc.
