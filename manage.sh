@@ -64,7 +64,7 @@ update_clients()
         (
             cd $(basename $repo)
             hub fork &>/dev/null
-            git checkout mgalgs/master &>/dev/null
+            git checkout mgalgs/master &>/dev/null || echo "Couldn't checkout mgalgs/master..."
             rm README.md
             make README.md &>/dev/null
             ret=$?
