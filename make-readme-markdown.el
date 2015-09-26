@@ -124,11 +124,13 @@
 (setq debug-on-error t)
 (require 'json)
 
-(defvar melpa-recipes-json "http://melpa.org/recipes.json")
+(defvar melpa-recipes-json-url "http://melpa.org/recipes.json")
+(defvar melpa-stable-recipes-json-url "http://stable.melpa.org/recipes.json")
 
 (defun get-remote-url-as-string (url)
-  (with-current-buffer (url-retrieve-synchronously melpa-recipes-json t)
+  (with-current-buffer (url-retrieve-synchronously url t)
     ;; remove http headers:
+    (goto-char 0)
     (delete-region 1 (re-search-forward "\r?\n\r?\n"))
     (buffer-string)))
 
@@ -284,29 +286,51 @@ Keeps items for whom `pred' returns non-nil."
       (setq line (car lines)))
     headers))
 
-(defun print-melpa-badge (lines)
-  (let* ((headers (get-file-headers lines))
-         (package-url (plist-get headers 'URL))
+(defun print-travis-badge (repo-key)
+  (let ((response (with-current-buffer (url-retrieve-synchronously (concat "http://api.travis-ci.org/repos/"
+                                                                           repo-key))
+                    (buffer-string))))
+    (unless (string-match-p "HTTP/.* 404 Not Found"
+                            response)
+      (princ (format "[![Build Status](https://travis-ci.org/%s.svg?branch=master)](https://travis-ci.org/%s)"
+                     repo-key repo-key)))))
+
+(defun print-melpa-badge (repo-key melpa-json melpa-base-url)
+  (let ((package-json (mrm--select melpa-json (lambda (el)
+                                                (and (string= repo-key
+                                                              (cdr (assoc 'repo el)))
+                                                     (string= "github"
+                                                              (cdr (assoc 'fetcher el)))))))
+        package-name)
+    (when package-json
+      (setq package-name (caar package-json))
+      (message "Adding badge for %s for %s" melpa-base-url package-name)
+      (princ (format "[![MELPA](%s/packages/%s-badge.svg)](%s/#/%s)\n"
+                     melpa-base-url
+                     package-name
+                     melpa-base-url
+                     package-name)))))
+
+(defun print-status-badges (lines)
+  (let* ((package-url (plist-get file-headers 'URL))
          repo-key repo-parts melpa-json package-json package-name)
     (when (and package-url (string-match-p "^https?://github.com/" package-url))
       (setq repo-parts (split-string package-url "/"))
       (setq repo-key (format "%s/%s"
                              (nth (- (length repo-parts) 2) repo-parts)
                              (nth (- (length repo-parts) 1) repo-parts)))
+      (message "Searching for Travis build using GitHub repo-key: %s..." repo-key)
+      (print-travis-badge repo-key)
       (message "Searching for MELPA package using GitHub repo-key: %s..."
                repo-key)
-      (setq melpa-json (get-remote-url-as-json melpa-recipes-json))
-      (setq package-json (mrm--select melpa-json (lambda (el)
-                                                   (and (string= repo-key
-                                                                 (cdr (assoc 'repo el)))
-                                                        (string= "github"
-                                                                 (cdr (assoc 'fetcher el)))))))
-      (when package-json
-        (setq package-name (caar package-json))
-        (message "Adding MELPA badge for %s" package-name)
-        (princ (format "[![MELPA](http://melpa.org/packages/%s-badge.svg)](http://melpa.org/#/%s)\n"
-                       package-name
-                       package-name))))))
+      (print-melpa-badge repo-key
+                         (get-remote-url-as-json melpa-recipes-json-url)
+                         "http://melpa.org")
+      (message "Searching for MELPA stable package using GitHub repo-key: %s..."
+               repo-key)
+      (print-melpa-badge repo-key
+                         (get-remote-url-as-json melpa-stable-recipes-json-url)
+                         "http://stable.melpa.org"))))
 
 (defun print-badges (lines)
   "Print badges for license, package repo, etc.
@@ -314,7 +338,9 @@ Keeps items for whom `pred' returns non-nil."
 Tries to parse a license from the comments, printing a badge for
 any license found."
   (print-license-badge lines)
-  (print-melpa-badge lines))
+  (print-status-badges lines))
+
+(defvar file-headers)
 
 (let* ((line nil)
        (title nil)
@@ -323,6 +349,8 @@ any license found."
        (started-output nil)
        (code-mode nil)
        (code (concat "(progn\n" (mapconcat 'identity lines "\n") "\n)")))
+
+  (setq file-headers (get-file-headers lines))
 
   ;; The first line should be like ";;; lol.el --- does stuff".
   (while (if (string-match "^;;;" (car lines))
