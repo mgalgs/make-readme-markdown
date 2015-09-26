@@ -63,8 +63,10 @@ update_clients()
         git clone https://github.com/$repo &>/dev/null
         (
             cd $(basename $repo)
-            hub fork &>/dev/null
-            git checkout mgalgs/master &>/dev/null || echo "Couldn't checkout mgalgs/master..."
+            [[ $repo =~ ^mgalgs/ ]] || {
+                hub fork &>/dev/null
+                git checkout mgalgs/master &>/dev/null || echo "Couldn't checkout mgalgs/master..."
+            }
             rm README.md
             make README.md &>/dev/null
             ret=$?
