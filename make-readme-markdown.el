@@ -122,12 +122,14 @@
 
 
 
+(require 'json)
+(require 'cl)
+
 (setq case-fold-search t)  ;; Ignore case in regexps.
 (setq debug-on-error t)
-(require 'json)
 
-(defvar melpa-recipes-json-url "http://melpa.org/recipes.json")
-(defvar melpa-stable-recipes-json-url "http://stable.melpa.org/recipes.json")
+(defvar melpa-archive-json-url "http://melpa.org/archive.json")
+(defvar melpa-stable-archive-json-url "http://stable.melpa.org/archive.json")
 
 (defun get-remote-url-as-string (url)
   (with-current-buffer (url-retrieve-synchronously url t)
@@ -295,12 +297,15 @@ Keeps items for whom `pred' returns non-nil."
       (princ (format "[![Build Status](https://travis-ci.org/%s.svg?branch=master)](https://travis-ci.org/%s)\n"
                      repo-key repo-key)))))
 
-(defun print-melpa-badge (repo-key melpa-json melpa-base-url)
+(defun assoc-cdr (key list)
+  (cdr (assoc key list)))
+
+(defun print-melpa-badge (package-url melpa-json melpa-base-url)
   (let ((package-json (mrm--select melpa-json (lambda (el)
-                                                (and (string= repo-key
-                                                              (cdr (assoc 'repo el)))
-                                                     (string= "github"
-                                                              (cdr (assoc 'fetcher el)))))))
+                                                (string= package-url
+                                                         (assoc-cdr 'url
+                                                                    (assoc-cdr 'props
+                                                                               el))))))
         package-name)
     (when package-json
       (setq package-name (caar package-json))
@@ -323,13 +328,13 @@ Keeps items for whom `pred' returns non-nil."
       (print-travis-badge repo-key)
       (message "Searching for MELPA package using GitHub repo-key: %s..."
                repo-key)
-      (print-melpa-badge repo-key
-                         (get-remote-url-as-json melpa-recipes-json-url)
+      (print-melpa-badge package-url
+                         (get-remote-url-as-json melpa-archive-json-url)
                          "http://melpa.org")
       (message "Searching for MELPA stable package using GitHub repo-key: %s..."
                repo-key)
-      (print-melpa-badge repo-key
-                         (get-remote-url-as-json melpa-stable-recipes-json-url)
+      (print-melpa-badge package-url
+                         (get-remote-url-as-json melpa-stable-archive-json-url)
                          "http://stable.melpa.org"))))
 
 (defun print-badges (lines)
