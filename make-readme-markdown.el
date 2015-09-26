@@ -71,10 +71,10 @@
 ;; anything... The following patterns at the beginning of a line are
 ;; special:
 ;;
-;; o `;;; My Header` :: Creates a header
-;; o `;; o My list item` :: Creates a list item
-;; o `;; * My list item` :: Creates a list item
-;; o `;; - My list item` :: Creates a list item
+;; o `;;; My Header` ⇒ Creates a header
+;; o `;; o My list item` ⇒ Creates a list item
+;; o `;; * My list item` ⇒ Creates a list item
+;; o `;; - My list item` ⇒ Creates a list item
 ;;
 ;; Everything else is stripped of its leading semicolons and first
 ;; space and is passed directly out. Note that you can embed markdown

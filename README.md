@@ -56,10 +56,10 @@ file header comment style, so hopefully you shouldn't have to do
 anything... The following patterns at the beginning of a line are
 special:
 
-* `;;; My Header` :: Creates a header
-* `;; o My list item` :: Creates a list item
-* `;; * My list item` :: Creates a list item
-* `;; - My list item` :: Creates a list item
+* `;;; My Header` ⇒ Creates a header
+* `;; o My list item` ⇒ Creates a list item
+* `;; * My list item` ⇒ Creates a list item
+* `;; - My list item` ⇒ Creates a list item
 
 Everything else is stripped of its leading semicolons and first
 space and is passed directly out. Note that you can embed markdown
