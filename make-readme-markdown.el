@@ -370,7 +370,6 @@ any license found."
       (princ "---\n")))
 
   (print-badges lines)
-  (princ "\n")
 
   ;; Process everything else.
   (catch 'break
