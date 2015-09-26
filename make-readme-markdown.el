@@ -383,8 +383,6 @@ any license found."
 
        ;; Wait until we reach the commentary section.
        ((string-match "^;;; Commentary:?$" line)
-        (when (string= "" (strip-comments (cadr lines)))
-          (setq lines (cdr lines)))
         (setq started-output t))
 
        ;; Once we hit code, attempt to document functions/macros.
