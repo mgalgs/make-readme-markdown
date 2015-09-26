@@ -30,8 +30,11 @@
 ;; very user-friendly or good marketing for your project to have an empty
 ;; README.md that refers people to your source code, and it's even worse if you
 ;; have to maintain two separate files that say the same thing.
+
+;;; Features:
 ;;
-;; A license badge will also be added if a license can be detected.
+;; o Public function documentation from docstrings
+;; o License and MELPA badges (auto-detected from comments)
 
 ;;; Installation:
 

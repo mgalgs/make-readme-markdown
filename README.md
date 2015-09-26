@@ -12,7 +12,11 @@ very user-friendly or good marketing for your project to have an empty
 README.md that refers people to your source code, and it's even worse if you
 have to maintain two separate files that say the same thing.
 
-A license badge will also be added if a license can be detected.
+### Features
+
+
+* Public function documentation from docstrings
+* License and MELPA badges (auto-detected from comments)
 
 ### Installation
 
