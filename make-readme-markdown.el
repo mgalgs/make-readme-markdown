@@ -287,7 +287,7 @@ Keeps items for whom `pred' returns non-nil."
   (let* ((headers (get-file-headers lines))
          (package-url (plist-get headers 'URL))
          repo-key repo-parts melpa-json package-json package-name)
-    (when (and package-url (string-prefix-p "https://github.com/" package-url))
+    (when (and package-url (string-match-p "^https?://github.com/" package-url))
       (setq repo-parts (split-string package-url "/"))
       (setq repo-key (format "%s/%s"
                              (nth (- (length repo-parts) 2) repo-parts)
