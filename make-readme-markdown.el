@@ -199,30 +199,31 @@
   (let ((func (buffer-substring-no-properties
                (match-beginning 2)
                (match-end 2))))
-    (when (not (string-match "--" func))
-      (move-beginning-of-line 1)
-      (let ((start (point)))
-        (forward-sexp)
-        (eval-region start (point)))
-      (let ((text (describe-function
-                   (eval (read (format "(function %s)" func))))))
-        (if (and (not (string-match "Not documented\\." text))
-                 (string-match "(" text))
-            (with-temp-buffer
-              (insert text)
-              (goto-char (match-beginning 0))
-              (forward-line)
-              (let* ((title-txt (replace-regexp-in-string "\n"
-                                                          ""
-                                                          (buffer-substring (point)
-                                                                            (progn (forward-sexp) (point)))))
-                     (rest (buffer-substring (point)
-                                             (point-max)))
-                     (cleaned-rest (fix-symbol-references rest))
-                     (printable (concat (make-section (format "`%s`" title-txt) 4)
-                                        cleaned-rest
-                                        "\n\n")))
-                (princ printable))))))))
+    (cl-letf (((symbol-function 'message) 'ignore))
+      (when (not (string-match "--" func))
+        (move-beginning-of-line 1)
+        (let ((start (point)))
+          (forward-sexp)
+          (eval-region start (point)))
+        (let ((text (describe-function
+                     (eval (read (format "(function %s)" func))))))
+          (if (and (not (string-match "Not documented\\." text))
+                   (string-match "(" text))
+              (with-temp-buffer
+                (insert text)
+                (goto-char (match-beginning 0))
+                (forward-line)
+                (let* ((title-txt (replace-regexp-in-string "\n"
+                                                            ""
+                                                            (buffer-substring (point)
+                                                                              (progn (forward-sexp) (point)))))
+                       (rest (buffer-substring (point)
+                                               (point-max)))
+                       (cleaned-rest (fix-symbol-references rest))
+                       (printable (concat (make-section (format "`%s`" title-txt) 4)
+                                          cleaned-rest
+                                          "\n\n")))
+                  (princ printable)))))))))
 
 (defun mrm--select (lst pred)
   "Filter `lst'.
