@@ -120,6 +120,8 @@
 
 ;;; Code:
 
+
+
 (setq case-fold-search t)  ;; Ignore case in regexps.
 (setq debug-on-error t)
 (require 'json)
@@ -287,12 +289,10 @@ Keeps items for whom `pred' returns non-nil."
     headers))
 
 (defun print-travis-badge (repo-key)
-  (let ((response (with-current-buffer (url-retrieve-synchronously (concat "http://api.travis-ci.org/repos/"
-                                                                           repo-key))
-                    (buffer-string))))
-    (unless (string-match-p "HTTP/.* 404 Not Found"
-                            response)
-      (princ (format "[![Build Status](https://travis-ci.org/%s.svg?branch=master)](https://travis-ci.org/%s)"
+  (let ((j (get-remote-url-as-json (concat "http://api.travis-ci.org/repos/"
+                                           repo-key))))
+    (when (cdr (assoc 'last_build_number j))
+      (princ (format "[![Build Status](https://travis-ci.org/%s.svg?branch=master)](https://travis-ci.org/%s)\n"
                      repo-key repo-key)))))
 
 (defun print-melpa-badge (repo-key melpa-json melpa-base-url)
