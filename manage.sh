@@ -65,6 +65,7 @@ update_clients()
             cd $(basename $repo)
             [[ $repo =~ ^mgalgs/ ]] || {
                 hub fork &>/dev/null
+                git fetch mgalgs &>/dev/null
                 git checkout mgalgs/master &>/dev/null || echo "Couldn't checkout mgalgs/master..."
             }
             rm README.md
