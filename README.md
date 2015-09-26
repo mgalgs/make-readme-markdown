@@ -65,14 +65,14 @@ blocks of code in your comments by leading the line with 4 spaces
 semicolon). For example:
 
     (defun strip-comments (line)
-      "Stip elisp comments from line"
+      "Strip elisp comments from line"
       (replace-regexp-in-string "^;+ ?" "" line))
 
 Or you can use the triple-backtic+lang approach, like so:
 
 ```elisp
 (defun strip-comments (line)
-  "Stip elisp comments from line"
+  "Strip elisp comments from line"
   (replace-regexp-in-string "^;+ ?" "" line))
 ```
 
@@ -104,7 +104,7 @@ an issue at https://github.com/mgalgs/make-readme-markdown/issues
 
 #### `(strip-comments LINE)`
 
-Stip elisp comments from line
+Strip elisp comments from line
 
 #### `(trim-string LINE)`
 
