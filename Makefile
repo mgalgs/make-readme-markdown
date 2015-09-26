@@ -5,10 +5,10 @@ all: README.md
 README.md: make-readme-markdown.el
 	$(EMACS) --script $< < $< > $@
 
-test: test.sh
-	./test.sh
+test: manage.sh
+	./manage.sh
 
-update_clients: test.sh
-	./test.sh update
+update_clients: manage.sh
+	./manage.sh update
 
 .PHONY: README.md
