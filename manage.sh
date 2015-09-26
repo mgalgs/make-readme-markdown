@@ -63,6 +63,8 @@ update_clients()
         git clone https://github.com/$repo &>/dev/null
         (
             cd $(basename $repo)
+            hub fork &>/dev/null
+            git checkout mgalgs/master &>/dev/null
             rm README.md
             make README.md &>/dev/null
             ret=$?
