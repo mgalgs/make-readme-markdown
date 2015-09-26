@@ -72,7 +72,7 @@ semicolon). For example:
       "Strip elisp comments from line"
       (replace-regexp-in-string "^;+ ?" "" line))
 
-Or you can use the triple-backtic+lang approach, like so:
+Or you can use the triple-backtic+lang notation, like so:
 
 ```elisp
 (defun strip-comments (line)
