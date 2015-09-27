@@ -15,8 +15,8 @@ have to maintain two separate files that say the same thing.
 ### Features
 
 
-* Smart conversion of standard Elisp comment conventions to
-  equivalent markdown (section headers, lists, etc)
+* Smart conversion of standard Elisp comment conventions to equivalent
+  markdown (section headers, lists, image links, etc)
 * Public function documentation from docstrings
 * License badge (auto-detected, see [Badges](#badges))
 * MELPA and MELPA-Stable badges (auto-detected, see [Badges](#badges))
@@ -158,6 +158,10 @@ Prints a section made with `make-section`.
 #### `(slurp)`
 
 Read all text from stdin as list of lines
+
+#### `(wrap-img-tags LINE)`
+
+Wrap image hyperlinks with img tags.
 
 #### `(print-formatted-line LINE)`
 

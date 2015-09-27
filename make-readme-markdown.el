@@ -34,8 +34,8 @@
 
 ;;; Features:
 ;;
-;; o Smart conversion of standard Elisp comment conventions to
-;;   equivalent markdown (section headers, lists, etc)
+;; o Smart conversion of standard Elisp comment conventions to equivalent
+;;   markdown (section headers, lists, image links, etc)
 ;; o Public function documentation from docstrings
 ;; o License badge (auto-detected, see [Badges](#badges))
 ;; o MELPA and MELPA-Stable badges (auto-detected, see [Badges](#badges))
@@ -203,9 +203,15 @@
       (error nil))
     (reverse lines)))
 
+(defun wrap-img-tags (line)
+  "Wrap image hyperlinks with img tags."
+  (replace-regexp-in-string "[^(]\\(https?://[^[:space:]]+\\(?:png\\|jpg\\|jpeg\\)\\)"
+                            "<img src=\"\\1\">"
+                            line))
+
 (defun print-formatted-line (line)
   "Prints a line formatted as markdown."
-  (setq line (fix-symbol-references line))
+  (setq line (wrap-img-tags (fix-symbol-references line)))
   (let ((stripped-line (strip-comments line)))
     (cond
 
