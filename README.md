@@ -15,6 +15,8 @@ have to maintain two separate files that say the same thing.
 ### Features
 
 
+* Smart conversion of standard Elisp comment conventions to
+  equivalent markdown (section headers, lists, etc)
 * Public function documentation from docstrings
 * License badge (auto-detected, see [Badges](#badges))
 * MELPA and MELPA-Stable badges (auto-detected, see [Badges](#badges))
@@ -127,9 +129,9 @@ a blank line and 8 spaces. For example:
 
 * I need to go for a run
 
-We parse everything between `;;; Commentary:` and `;;; Code`. See
-make-readme-markdown.el for an example (you might already be
-looking at it... whoa, this is really getting meta...).
+We convert everything between `;;; Commentary:` and `;;; Code` into
+markdown. See make-readme-markdown.el for an example (you might already
+be looking at it... whoa, this is really getting meta...).
 
 If there's some more syntax you would like to see supported, submit
 an issue at https://github.com/mgalgs/make-readme-markdown/issues

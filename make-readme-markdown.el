@@ -34,17 +34,19 @@
 
 ;;; Features:
 ;;
+;; o Smart conversion of standard Elisp comment conventions to
+;;   equivalent markdown (section headers, lists, etc)
 ;; o Public function documentation from docstrings
 ;; o License badge (auto-detected, see [Badges](#badges))
 ;; o MELPA and MELPA-Stable badges (auto-detected, see [Badges](#badges))
 ;; o Travis badge (auto-detected, see [Badges](#badges))
 
 ;;; Installation:
-
+;;
 ;; None
 
 ;;; Usage:
-
+;;
 ;; The recommended way to use this tool is by putting the following code in
 ;; your Makefile and running `make README.md` (You don't even have to clone the
 ;; repository!):
@@ -66,7 +68,7 @@
 ;; that private elisp functions have two hypens, like `cup--noodle`.
 
 ;;; Badges:
-
+;;
 ;; A license badge is generated if a license can be detected.  Just include
 ;; the license in your files header comments like normal, taking care to
 ;; copy/paste the license from its source verbatim.
@@ -92,7 +94,7 @@
 ;; listed URL is on GitHub.
 
 ;;; Syntax:
-
+;;
 ;; In order for this module to do you any good, you should write your
 ;; file header comments in a way that make-readme-markdown.el
 ;; understands. An attempt has been made to support the most common
@@ -142,9 +144,9 @@
 ;;
 ;; o I need to go for a run
 ;;
-;; We parse everything between `;;; Commentary:` and `;;; Code`. See
-;; make-readme-markdown.el for an example (you might already be
-;; looking at it... whoa, this is really getting meta...).
+;; We convert everything between `;;; Commentary:` and `;;; Code` into
+;; markdown. See make-readme-markdown.el for an example (you might already
+;; be looking at it... whoa, this is really getting meta...).
 ;;
 ;; If there's some more syntax you would like to see supported, submit
 ;; an issue at https://github.com/mgalgs/make-readme-markdown/issues
