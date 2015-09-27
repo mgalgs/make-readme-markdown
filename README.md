@@ -90,12 +90,12 @@ of a line are special:
 * `;; * My list item` ⇒ Creates a list item
 * `;; - My list item` ⇒ Creates a list item
 
-Everything else is stripped of its leading semicolons and first
-space and is passed directly out. Note that you can embed markdown
-syntax directly in your comments. This means that you can embed
-blocks of code in your comments by leading the line with 4 spaces
-(in addition to the first space directly following the last
-semicolon). For example:
+Everything else is stripped of its leading semicolons and its first
+space, then is passed directly out.  This means that you can embed
+markdown syntax directly in your comments.  For example, you can embed
+blocks of code in your comments by leading the line with 4 spaces (in
+addition to the first space directly following the last semicolon). For
+example:
 
     (defun strip-comments (line)
       "Strip elisp comments from line"
