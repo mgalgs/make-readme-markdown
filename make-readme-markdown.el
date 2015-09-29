@@ -5,6 +5,7 @@
 ;; Copyright (C) 2013, Justine Tunney
 
 ;; Author: Mitchel Humpherys <mitch.special@gmail.com>
+;; Maintainer: Mitchel Humpherys <mitch.special@gmail.com>
 ;; Keywords: tools, convenience
 ;; Version: 0.1
 ;; URL: https://github.com/mgalgs/make-readme-markdown
