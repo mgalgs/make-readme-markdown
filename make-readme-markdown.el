@@ -25,7 +25,7 @@
 
 ;;; Commentary:
 
-;; This tool will let you easily convert elisp file headers to markdown text so
+;; This tool will let you easily convert Elisp file comments to markdown text so
 ;; long as the file comments and documentation follow standard conventions
 ;; (like this file). This is because when you're writing an elisp module, the
 ;; module itself should be the canonical source of documentation. But it's not
@@ -71,13 +71,13 @@
 ;;; Badges:
 ;;
 ;; A license badge is generated if a license can be detected.  Just include
-;; the license in your file's header comments like normal, taking care to
+;; the license in your file's comments like normal, taking care to
 ;; copy/paste the license from its source verbatim.
 ;;
 ;; A MELPA badge is generated if a package is listed on MELPA whose URL
-;; matches the URL in your file's header comments.  Specifically, the URL
-;; is taken from that familiar chunk of key-value pairs near the top of
-;; your file's header comments that usually look something like this:
+;; matches the URL in your file's pseudo-headers.  Specifically, the URL is
+;; taken from that familiar chunk of key-value pairs near the top of your
+;; file's pseudo-header comments that usually look something like this:
 ;;
 ;;     ;; Author: Mitchel Humpherys <mitch.special@gmail.com>
 ;;     ;; Keywords: convenience, diff
@@ -97,9 +97,9 @@
 
 ;;; Syntax:
 ;;
-;; An attempt has been made to support the most common Elisp file header
-;; comment conventions.  Specifically, following patterns at the beginning
-;; of a line are special:
+;; An attempt has been made to support the most common Elisp file comment
+;; conventions.  Specifically, following patterns at the beginning of a
+;; line are special:
 ;;
 ;; o `;;; My Header:` ⇒ Creates a header
 ;; o `;; o My list item` ⇒ Creates a list item
