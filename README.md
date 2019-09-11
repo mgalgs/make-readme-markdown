@@ -1,3 +1,4 @@
+<a href="https://github.com/mgalgs/make-readme-markdown"><img src="https://www.gnu.org/software/emacs/images/emacs.png" alt="Emacs Logo" width="80" height="80" align="right"></a>
 ## make-readme-markdown.el
 *Convert emacs lisp documentation to markdown all day every day*
 
@@ -21,6 +22,7 @@ have to maintain two separate files that say the same thing.
 * License badge (auto-detected, see [Badges](#badges))
 * MELPA and MELPA-Stable badges (auto-detected, see [Badges](#badges))
 * Travis badge (auto-detected, see [Badges](#badges))
+* Emacs Icon
 
 ### Installation
 
@@ -181,6 +183,10 @@ Print badges for license, package repo, etc.
 
 Tries to parse a license from the comments, printing a badge for
 any license found.
+
+#### `(print-emacs-icon)`
+
+Print emacs icon to generate a fancy README.md.
 
 -----
 <div style="padding-top:15px;color: #d0d0d0;">
