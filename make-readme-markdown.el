@@ -41,6 +41,7 @@
 ;; o License badge (auto-detected, see [Badges](#badges))
 ;; o MELPA and MELPA-Stable badges (auto-detected, see [Badges](#badges))
 ;; o Travis badge (auto-detected, see [Badges](#badges))
+;; o Emacs Icon
 
 ;;; Installation:
 ;;
@@ -384,6 +385,20 @@ any license found."
   (print-license-badge lines)
   (print-status-badges lines))
 
+(defun print-emacs-icon ()
+  "Print emacs icon to generate a fancy README.md."
+  (let* ((package-url (plist-get file-headers 'URL))
+         (logo-url "<img src=\"https://www.gnu.org/software/emacs/images/emacs.png\" alt=\"Emacs Logo\" width=\"80\" height=\"80\" align=\"right\">"))
+    (if package-url
+        (progn
+          (message "Adding emacs icon with URL: %s" package-url)
+          (princ (format "<a href=\"%s\">%s</a>\n"
+                         package-url
+                         logo-url)))
+        (message "Adding emacs icon without URL")
+        (princ (format "%s\n"
+                       logo-url)))))
+
 (defvar file-headers)
 
 (let* ((line nil)
@@ -395,6 +410,9 @@ any license found."
        (code (concat "(progn\n" (mapconcat 'identity lines "\n") "\n)")))
 
   (setq file-headers (get-file-headers lines))
+
+  ;; Add Emacs icon to README.md first
+  (print-emacs-icon)
 
   ;; The first line should be like ";;; lol.el --- does stuff".
   (while (if (string-match "^;;;" (car lines))
