@@ -38,7 +38,8 @@ regression_test()
         emacs --script baseline.el < testfile > testfile.md.after 2>/dev/null
         basename=${user##*/}
         if ! diff testfile.md.before testfile.md.after > $basename.diff; then
-            echo "$basename changed. Saved diff to $basename.diff"
+            echo "$basename changed. Saved diff to $basename.diff. Also copying here:"
+            cat $basename.diff
         else
             echo "$basename OK"
             rm $basename.diff
