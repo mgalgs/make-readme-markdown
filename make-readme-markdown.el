@@ -176,6 +176,11 @@
   "Strip elisp comments from line"
   (replace-regexp-in-string "^;+ ?" "" line))
 
+(defun strip-file-variables (line)
+  "Strip elisp file variables from the first LINE in a file.
+E.g., `-*- lexical-binding: t; -*-'"
+  (replace-regexp-in-string " *-\\*-.*-\\*-$" "" line))
+
 (defun trim-string (line)
   "Trim spaces from beginning and end of string"
   (replace-regexp-in-string " +$" ""
@@ -428,7 +433,7 @@ any license found."
     (let ((title-parts (split-string title " --- ")))
       (print-section (car title-parts) 2)
       (when (cdr title-parts)
-        (princ (format "*%s*\n\n" (cadr title-parts))))
+        (princ (format "*%s*\n\n" (strip-file-variables (cadr title-parts)))))
       (princ "---\n")))
 
   (print-badges lines)
