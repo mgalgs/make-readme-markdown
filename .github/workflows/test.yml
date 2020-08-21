@@ -26,5 +26,5 @@ jobs:
       run: env
     - name: Run regression tests
       env:
-        BEFORE: master
+        BEFORE: ${{ github.base_ref }}
       run: ./manage.sh
