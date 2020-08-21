@@ -22,4 +22,6 @@ jobs:
       with:
         version: ${{ matrix.emacs_version }}
     - name: Run regression tests
+      env:
+        BEFORE: master
       run: ./manage.sh
