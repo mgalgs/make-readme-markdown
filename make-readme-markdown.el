@@ -248,8 +248,9 @@
         (let ((start (point)))
           (forward-sexp)
           (eval-region start (point)))
-        (let ((text (describe-function
-                     (eval (read (format "(function %s)" func))))))
+        (let* ((text-quoting-style 'grave)
+               (text (describe-function
+                      (eval (read (format "(function %s)" func))))))
           (if (and (not (string-match "Not documented\\." text))
                    (string-match "(" text))
               (with-temp-buffer
