@@ -22,7 +22,6 @@ users=(
     https://raw.githubusercontent.com/emacs-pe/jist.el/master/jist.el
     https://raw.githubusercontent.com/emacs-pe/vagrant.el/master/vagrant.el
     https://raw.githubusercontent.com/rranelli/auto-package-update.el/master/auto-package-update.el
-    https://raw.githubusercontent.com/rranelli/simple-highlight/master/simple-highlight.el
     https://raw.githubusercontent.com/wentasah/meson-mode/master/meson-mode.el
 )
 
