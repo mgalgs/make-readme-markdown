@@ -22,8 +22,5 @@ jobs:
     - uses: purcell/setup-emacs@master
       with:
         version: ${{ matrix.emacs_version }}
-    - uses: leotaku/elisp-check@master
-      with:
-        file: make-readme-markdown.el
     - name: Run regression tests
       run: ./manage.sh
