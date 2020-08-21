@@ -1,1 +1,5 @@
 *~
+/testfile
+/testfile.md.before
+/testfile.md.after
+/baseline.el
