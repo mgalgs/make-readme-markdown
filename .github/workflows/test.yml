@@ -19,6 +19,8 @@ jobs:
           - snapshot
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - uses: purcell/setup-emacs@master
       with:
         version: ${{ matrix.emacs_version }}
