@@ -26,5 +26,5 @@ jobs:
         version: ${{ matrix.emacs_version }}
     - name: Run regression tests
       env:
-        BEFORE: ${{ github.base_ref }}
+        BEFORE: ${{ github.event.pull_request.base.sha }}
       run: ./manage.sh
