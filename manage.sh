@@ -3,7 +3,6 @@
 # Simple regression test to make sure we don't break any users.
 
 users=(
-    https://raw.githubusercontent.com/doitian/iy-go-to-char/master/iy-go-to-char.el
     https://raw.githubusercontent.com/coldnew/org-html5slide/master/ox-html5slide.el
     https://raw.githubusercontent.com/coldnew/ac-octave/master/ac-octave.el
     https://raw.githubusercontent.com/coldnew/pangu-spacing/master/pangu-spacing.el
