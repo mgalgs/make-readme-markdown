@@ -29,6 +29,7 @@ users=(
 regression_test()
 {
     echo "Running regression tests..."
+    retval=0
 
     BEFORE=${BEFORE:-origin/master}
     git show ${BEFORE}:./make-readme-markdown.el > baseline.el
@@ -41,6 +42,7 @@ regression_test()
         if ! diff testfile.md.before testfile.md.after > $basename.diff; then
             echo "$basename changed. Saved diff to $basename.diff. Also copying here:"
             cat $basename.diff
+            retval=1
         else
             echo "$basename OK"
             rm $basename.diff
@@ -50,6 +52,7 @@ regression_test()
 
     rm -f testfile
     rm -f baseline.el
+    return $retval
 }
 
 update_clients()
@@ -86,3 +89,4 @@ update_clients()
 
 [[ $1 == "update" ]] && { update_clients; exit $?; }
 regression_test
+exit $?
