@@ -22,8 +22,6 @@ jobs:
     - uses: purcell/setup-emacs@master
       with:
         version: ${{ matrix.emacs_version }}
-    - name: debug
-      run: env
     - name: Run regression tests
       env:
         BEFORE: ${{ github.base_ref }}
