@@ -1,7 +1,7 @@
 ;;; make-readme-markdown.el --- Convert emacs lisp documentation to
 ;;; markdown all day every day
 
-;; Copyright (C) 2011-2015, Mitchel Humpherys
+;; Copyright (C) 2011-2022, Mitchel Humpherys
 ;; Copyright (C) 2013, Justine Tunney
 
 ;; Author: Mitchel Humpherys <mitch.special@gmail.com>
@@ -65,9 +65,10 @@
 ;;
 ;;     $ emacs --script make-readme-markdown.el <elisp-file-to-parse.el 2>/dev/null
 ;;
-;; All functions and macros in your module with docstrings will be documented
-;; in the output unless they've been marked as private. Convention dictates
-;; that private elisp functions have two hypens, like `cup--noodle`.
+;; All functions, macros, and customizable variables in your module with
+;; docstrings will be documented in the output unless they've been marked
+;; as private. Convention dictates that private elisp functions have two
+;; hypens, like `cup--noodle`.
 
 ;;; Badges:
 ;;
@@ -114,14 +115,14 @@
 ;; addition to the first space directly following the last semicolon). For
 ;; example:
 ;;
-;;     (defun strip-comments (line)
+;;     (defun mrm-strip-comments (line)
 ;;       "Strip elisp comments from line"
 ;;       (replace-regexp-in-string "^;+ ?" "" line))
 ;;
 ;; Or you can use the triple-backtic+lang notation, like so:
 ;;
 ;; ```elisp
-;; (defun strip-comments (line)
+;; (defun mrm-strip-comments (line)
 ;;   "Strip elisp comments from line"
 ;;   (replace-regexp-in-string "^;+ ?" "" line))
 ;; ```
@@ -148,6 +149,10 @@
 ;;
 ;; If there's some more syntax you would like to see supported, submit
 ;; an issue at https://github.com/mgalgs/make-readme-markdown/issues
+;;
+;; Many of the functions in this module should probably be "private" (named
+;; with a double-hypen ("--") but are left "public" for illustration
+;; purposes.
 
 ;;; Code:
 
@@ -162,46 +167,46 @@
 (defvar melpa-archive-json-url "http://melpa.org/archive.json")
 (defvar melpa-stable-archive-json-url "http://stable.melpa.org/archive.json")
 
-(defun get-remote-url-as-string (url)
+(defun mrm--get-remote-url-as-string (url)
   (with-current-buffer (url-retrieve-synchronously url t)
     ;; remove http headers:
     (goto-char 0)
     (delete-region 1 (re-search-forward "\r?\n\r?\n"))
     (buffer-string)))
 
-(defun get-remote-url-as-json (url)
-  (json-read-from-string (get-remote-url-as-string url)))
+(defun mrm--get-remote-url-as-json (url)
+  (json-read-from-string (mrm--get-remote-url-as-string url)))
 
-(defun strip-comments (line)
+(defun mrm-strip-comments (line)
   "Strip elisp comments from line"
   (replace-regexp-in-string "^;+ ?" "" line))
 
-(defun strip-file-variables (line)
+(defun mrm-strip-file-variables (line)
   "Strip elisp file variables from the first LINE in a file.
 E.g., `-*- lexical-binding: t; -*-'"
   (replace-regexp-in-string " *-\\*-.*-\\*-$" "" line))
 
-(defun trim-string (line)
+(defun mrm-trim-string (line)
   "Trim spaces from beginning and end of string"
   (replace-regexp-in-string " +$" ""
                             (replace-regexp-in-string "^ +" "" line)))
 
-(defun fix-symbol-references (line)
+(defun mrm-fix-symbol-references (line)
   "Fix refs like `this' so they don't turn adjacent text into code."
   (replace-regexp-in-string "`[^`\t ]+\\('\\)" "`" line nil nil 1))
 
-(defun make-section (line level)
+(defun mrm-make-section (line level)
   "Makes a markdown section using the `#' syntax."
   (setq line (replace-regexp-in-string ":?[ \t]*$" "" line))
   (setq line (replace-regexp-in-string " --- " " – " line))
   (format "%s %s" (make-string level ?#) line))
 
-(defun print-section (line level)
-  "Prints a section made with `make-section'."
-  (princ (make-section line level))
+(defun mrm-print-section (line level)
+  "Prints a section made with `mrm-make-section'."
+  (princ (mrm-make-section line level))
   (princ "\n"))
 
-(defun slurp ()
+(defun mrm-slurp ()
   "Read all text from stdin as list of lines"
   (let (line lines)
     (condition-case nil
@@ -210,21 +215,21 @@ E.g., `-*- lexical-binding: t; -*-'"
       (error nil))
     (reverse lines)))
 
-(defun wrap-img-tags (line)
+(defun mrm-wrap-img-tags (line)
   "Wrap image hyperlinks with img tags."
   (replace-regexp-in-string "[^(]\\(https?://[^[:space:]]+\\(?:png\\|jpg\\|jpeg\\)\\)"
                             "<img src=\"\\1\">"
                             line))
 
-(defun print-formatted-line (line)
+(defun mrm-print-formatted-line (line)
   "Prints a line formatted as markdown."
-  (setq line (wrap-img-tags (fix-symbol-references line)))
-  (let ((stripped-line (strip-comments line)))
+  (setq line (mrm-wrap-img-tags (mrm-fix-symbol-references line)))
+  (let ((stripped-line (mrm-strip-comments line)))
     (cond
 
      ;; Header line (starts with ";;; ")
      ((string-match "^;;; " line)
-      (print-section stripped-line 3))
+      (mrm-print-section stripped-line 3))
 
      ;; list line (starts with " o ")
      ((string-match "^ *o " stripped-line)
@@ -238,40 +243,70 @@ E.g., `-*- lexical-binding: t; -*-'"
   ;; and a newline
   (princ "\n"))
 
-(defun document-a-function ()
-  "Searches for next defun/macro and print markdown documentation."
-  (unless (search-forward-regexp
-           "^(\\(defun\\|defmacro\\) \\([^ ]+\\) " nil t)
-    (throw 'no-more-funcs nil))
-  (let ((func (buffer-substring-no-properties
-               (match-beginning 2)
-               (match-end 2))))
-    (cl-letf (((symbol-function 'message) 'ignore))
-      (when (not (string-match "--" func))
-        (move-beginning-of-line 1)
-        (let ((start (point)))
-          (forward-sexp)
-          (eval-region start (point)))
-        (let* ((text-quoting-style 'grave)
-               (text (describe-function
-                      (eval (read (format "(function %s)" func))))))
-          (if (and (not (string-match "Not documented\\." text))
-                   (string-match "(" text))
-              (with-temp-buffer
-                (insert text)
-                (goto-char (match-beginning 0))
-                (forward-line)
-                (let* ((title-txt (replace-regexp-in-string "\n"
-                                                            ""
-                                                            (buffer-substring (point)
-                                                                              (progn (forward-sexp) (point)))))
-                       (rest (buffer-substring (point)
-                                               (point-max)))
-                       (cleaned-rest (fix-symbol-references rest))
-                       (printable (concat (make-section (format "`%s`" title-txt) 4)
-                                          cleaned-rest
-                                          "\n\n")))
-                  (princ printable)))))))))
+(setq doc-function-alist '((defun . mrm-document-a-defun)
+                           (defmacro . mrm-document-a-defun)
+                           (defcustom . mrm-document-a-defcustom)))
+
+(defun mrm-parse-docs-for-a-thing ()
+  "Searches for the next defun/defmacro/defcustom and prints
+markdown documentation.
+
+Returns a list of the form (token token-name title-text docstring).
+Example return value:
+(\"defun\" \"document-a-defmacro\" \"(document-a-defmacro CODE)\" \"Takes a defmacro form and...\""
+  (unless (search-forward-regexp "^(\\(defun\\|defmacro\\|defcustom\\) \\([^ ]+\\)" nil t)
+    (throw 'no-more-things nil))
+
+  (beginning-of-defun)
+  (let* ((beg (point))
+         (end (progn
+                (forward-sexp)
+                (point)))
+         (code (car (read-from-string (buffer-substring-no-properties beg end))))
+         (token (car code))
+         (documenter (mrm-cdr-assoc token doc-function-alist)))
+    (when documenter
+      (let* ((docresults (funcall documenter code))
+             (token-name (symbol-name (nth 1 code)))
+             (title-text (car docresults))
+             (docstring (cdr docresults)))
+        (unless (string-match "--" token-name)
+          (list (symbol-name token)
+                token-name
+                title-text
+                docstring))))))
+
+(defun mrm-document-a-defcustom (code)
+  "Takes a defcustom form and returns documentation for it as a
+string"
+  (let* ((title-text (symbol-name (nth 1 code)))
+         (docs (mrm-fix-symbol-references (nth 3 code))))
+    (cons title-text docs)))
+
+(defun mrm-document-a-defun (code)
+  "Takes a defun form and returns documentation for it as a string"
+  (let* ((text-quoting-style 'grave)
+         (text (describe-function (eval code))))
+    (when (and (not (string-match "Not documented\\." text))
+               (string-match "(" text))
+      (with-temp-buffer
+        (insert text)
+        (goto-char (match-beginning 0))
+        (forward-line)
+        (let* ((title-text (replace-regexp-in-string "\n"
+                                                     ""
+                                                     (buffer-substring (point)
+                                                                       (progn (forward-sexp)
+                                                                              (point)))))
+               (rest (buffer-substring (progn (forward-line 2)
+                                              (point))
+                                       (progn (goto-char (point-max))
+                                              (forward-line -1)
+                                              (point))))
+               (cleaned-rest (replace-regexp-in-string "[[:space:]]$"
+                                                       ""
+                                                       (mrm-fix-symbol-references rest))))
+          (cons title-text cleaned-rest))))))
 
 (defun mrm--select (lst pred)
   "Filter `lst'.
@@ -293,33 +328,33 @@ Keeps items for whom `pred' returns non-nil."
                          ("BSD" . "[![License BSD](https://img.shields.io/badge/license-BSD-green.svg)](http://opensource.org/licenses/BSD-3-Clause)")
                          ("Apachev2" . "[![License Apache v2](https://img.shields.io/badge/license-Apache_v2-green.svg)](http://www.apache.org/licenses/LICENSE-2.0)")))
 
-(defun squeeze-spaces (txt)
+(defun mrm-squeeze-spaces (txt)
   "Coalesce whitespace."
   (replace-regexp-in-string "[\n[:space:]]+" " " txt))
 
-(defun get-all-comments-single-line (lines)
+(defun mrm-get-all-comments-single-line (lines)
   (with-temp-buffer
     (insert (mapconcat (lambda (el) (replace-regexp-in-string "^[[:space:]]*;+" " " el))
                        (mrm--select lines
                                     (lambda (el) (string-match-p "^[[:space:]]*;" el)))
                        "\n"))
-    (downcase (squeeze-spaces (buffer-string)))))
+    (downcase (mrm-squeeze-spaces (buffer-string)))))
 
-(defun print-license-badge (lines)
-  (let* ((comment-txt (get-all-comments-single-line lines))
+(defun mrm-print-license-badge (lines)
+  (let* ((comment-txt (mrm-get-all-comments-single-line lines))
          (candidates (mrm--select license-texts (lambda (license)
-                                                  (string-match-p (downcase (squeeze-spaces (cdr license)))
+                                                  (string-match-p (downcase (mrm-squeeze-spaces (cdr license)))
                                                                   comment-txt)))))
     (cond
      ((= (length candidates) 0)
       (message "No license found"))
      ((= (length candidates) 1)
       (message "Found license: %s" (caar candidates))
-      (princ (format "%s\n" (cdr (assoc (caar candidates) license-badges)))))
+      (princ (format "%s\n" (mrm-cdr-assoc (caar candidates) license-badges))))
      (t
       (message "Multiple licenses found: %s" candidates)))))
 
-(defun get-file-headers (lines)
+(defun mrm-get-file-headers (lines)
   (let ((line (car lines))
         headers)
     (while (not (string-match-p "^;;; Commentary:?$" line))
@@ -332,22 +367,22 @@ Keeps items for whom `pred' returns non-nil."
       (setq line (car lines)))
     headers))
 
-(defun print-travis-badge (repo-key)
-  (let ((j (get-remote-url-as-json (concat "http://api.travis-ci.org/repos/"
-                                           repo-key))))
-    (when (cdr (assoc 'last_build_number j))
+(defun mrm-print-travis-badge (repo-key)
+  (let ((j (mrm--get-remote-url-as-json (concat "http://api.travis-ci.org/repos/"
+                                                repo-key))))
+    (when (mrm-cdr-assoc 'last_build_number j)
       (princ (format "[![Build Status](https://travis-ci.org/%s.svg?branch=master)](https://travis-ci.org/%s)\n"
                      repo-key repo-key)))))
 
-(defun assoc-cdr (key list)
+(defun mrm-cdr-assoc (key list)
   (cdr (assoc key list)))
 
-(defun print-melpa-badge (package-url melpa-json melpa-base-url title)
+(defun mrm-print-melpa-badge (package-url melpa-json melpa-base-url title)
   (let ((package-json (mrm--select melpa-json (lambda (el)
                                                 (string= package-url
-                                                         (assoc-cdr 'url
-                                                                    (assoc-cdr 'props
-                                                                               el))))))
+                                                         (mrm-cdr-assoc 'url
+                                                                        (mrm-cdr-assoc 'props
+                                                                                       el))))))
         package-name)
     (when package-json
       (setq package-name (caar package-json))
@@ -359,7 +394,7 @@ Keeps items for whom `pred' returns non-nil."
                      melpa-base-url
                      package-name)))))
 
-(defun print-status-badges (lines)
+(defun mrm-print-status-badges (lines)
   (let* ((package-url (plist-get file-headers 'URL))
          repo-key repo-parts melpa-json package-json package-name)
     (when (and package-url (string-match-p "^https?://github.com/" package-url))
@@ -368,29 +403,29 @@ Keeps items for whom `pred' returns non-nil."
                              (nth (- (length repo-parts) 2) repo-parts)
                              (nth (- (length repo-parts) 1) repo-parts)))
       (message "Searching for Travis build using GitHub repo-key: %s..." repo-key)
-      (print-travis-badge repo-key)
+      (mrm-print-travis-badge repo-key)
       (message "Searching for MELPA package using GitHub repo-key: %s..."
                repo-key)
-      (print-melpa-badge package-url
-                         (get-remote-url-as-json melpa-archive-json-url)
-                         "http://melpa.org"
-                         "MELPA")
+      (mrm-print-melpa-badge package-url
+                             (mrm--get-remote-url-as-json melpa-archive-json-url)
+                             "http://melpa.org"
+                             "MELPA")
       (message "Searching for MELPA stable package using GitHub repo-key: %s..."
                repo-key)
-      (print-melpa-badge package-url
-                         (get-remote-url-as-json melpa-stable-archive-json-url)
-                         "http://stable.melpa.org"
-                         "MELPA Stable"))))
+      (mrm-print-melpa-badge package-url
+                             (mrm--get-remote-url-as-json melpa-stable-archive-json-url)
+                             "http://stable.melpa.org"
+                             "MELPA Stable"))))
 
-(defun print-badges (lines)
+(defun mrm-print-badges (lines)
   "Print badges for license, package repo, etc.
 
 Tries to parse a license from the comments, printing a badge for
 any license found."
-  (print-license-badge lines)
-  (print-status-badges lines))
+  (mrm-print-license-badge lines)
+  (mrm-print-status-badges lines))
 
-(defun print-emacs-icon ()
+(defun mrm-print-emacs-icon ()
   "Print emacs icon to generate a fancy README.md."
   (let* ((package-url (plist-get file-headers 'URL))
          (logo-url "<img src=\"https://www.gnu.org/software/emacs/images/emacs.png\" alt=\"Emacs Logo\" width=\"80\" height=\"80\" align=\"right\">"))
@@ -400,74 +435,122 @@ any license found."
           (princ (format "<a href=\"%s\">%s</a>\n"
                          package-url
                          logo-url)))
-        (message "Adding emacs icon without URL")
-        (princ (format "%s\n"
-                       logo-url)))))
+      (message "Adding emacs icon without URL")
+      (princ (format "%s\n"
+                     logo-url)))))
 
 (defvar file-headers)
 
-(let* ((line nil)
-       (title nil)
-       (title-lines)
-       (lines (slurp))
-       (started-output nil)
-       (code-mode nil)
-       (code (concat "(progn\n" (mapconcat 'identity lines "\n") "\n)")))
+;;; debugging: evaluate this buffer (except for the call to main below),
+;;; then instrument this function, and go to a buffer and evaluate:
+;;;
+;;; (main (split-string (substring-no-properties (buffer-string)) "\n"))
 
-  (setq file-headers (get-file-headers lines))
+(defun main (lines)
+  (let* ((line nil)
+         (title nil)
+         (title-lines)
+         (started-output nil)
+         (code-mode nil)
+         (code (concat "(progn\n" (mapconcat 'identity lines "\n") "\n)"))
+         (docs-alist '(("defun" . nil)
+                       ("defmacro" . nil)
+                       ("defcustom" . nil))))
 
-  ;; Add Emacs icon to README.md first
-  (print-emacs-icon)
+    (setq file-headers (mrm-get-file-headers lines))
 
-  ;; The first line should be like ";;; lol.el --- does stuff".
-  (while (if (string-match "^;;;" (car lines))
-             (setq title-lines (cons (strip-comments (car lines))
-                                     title-lines)
-                   lines (cdr lines))))
+    ;; Add Emacs icon to README.md first
+    (mrm-print-emacs-icon)
 
-  (setq title (mapconcat 'identity
-                         (reverse title-lines)
-                         " "))
+    ;; The first line should be like ";;; lol.el --- does stuff".
+    (while (if (string-match "^;;;" (car lines))
+               (setq title-lines (cons (mrm-strip-comments (car lines))
+                                       title-lines)
+                     lines (cdr lines))))
 
-  (unless (string= title "")
-    (let ((title-parts (split-string title " --- ")))
-      (print-section (car title-parts) 2)
-      (when (cdr title-parts)
-        (princ (format "*%s*\n\n" (strip-file-variables (cadr title-parts)))))
-      (princ "---\n")))
+    (setq title (mapconcat 'identity
+                           (reverse title-lines)
+                           " "))
 
-  (print-badges lines)
+    (unless (string= title "")
+      (let ((title-parts (split-string title " --- ")))
+        (mrm-print-section (car title-parts) 2)
+        (when (cdr title-parts)
+          (princ (format "*%s*\n\n" (mrm-strip-file-variables (cadr title-parts)))))
+        (princ "---\n")))
 
-  ;; Process everything else.
-  (catch 'break
-    (while (setq line (car lines))
-      (cond
+    (mrm-print-badges lines)
 
-       ;; Wait until we reach the commentary section.
-       ((string-match "^;;; Commentary:?$" line)
-        (setq started-output t))
+    ;; Process everything else.
+    (catch 'break
+      (while (setq line (car lines))
+        (cond
 
-       ;; Once we hit code, attempt to document functions/macros.
-       ((string-match "^;;; Code:?$" line)
-        (print-section "Function Documentation" 3)
-        (princ "\n\n")
-        (with-temp-buffer
-          (insert code)
-          (goto-char 0)
-          (lisp-mode)
-          (catch 'no-more-funcs
-            (while t
-              (condition-case exc
-                  (document-a-function)
-                (error
-                 (princ (format "<!-- Error: %s -->\n\n" exc)))))))
-        (throw 'break nil))
+         ;; Wait until we reach the commentary section.
+         ((string-match "^;;; Commentary:?$" line)
+          (setq started-output t))
 
-       ;; Otherwise print out all the documentation.
-       (started-output
-        (print-formatted-line line)))
+         ;; Once we hit code, collect documentation for functions/macros.
+         ((string-match "^;;; Code:?$" line)
+          (princ "\n\n")
+          (with-temp-buffer
+            (insert code)
+            (goto-char 0)
+            (lisp-mode)
+            (catch 'no-more-things
+              (while t
+                (condition-case exc
+                    (let* ((result (mrm-parse-docs-for-a-thing))
+                           (token (nth 0 result))
+                           (token-name (nth 1 result))
+                           (title-text (nth 2 result))
+                           (doc (nth 3 result))
+                           (docs-alist-key (if (string= token "defmacro")
+                                               "defun"
+                                             token)))
+                      (when (and token doc)
+                        (let* ((doclist (mrm-cdr-assoc docs-alist-key docs-alist))
+                               (newdoclist (cons (list token title-text doc) doclist)))
+                          (setf (cdr (assoc docs-alist-key docs-alist))
+                                newdoclist))))
+                  (errorz
+                   (princ (format "<!-- Error: %s -->\n\n" exc)))))))
+          (throw 'break nil))
 
-      (setq lines (cdr lines)))))
+         ;; Otherwise print out all the documentation.
+         (started-output
+          (mrm-print-formatted-line line)))
+
+        (setq lines (cdr lines))))
+
+    ;; Output defcustom docs
+    (when (mrm-cdr-assoc "defcustom" docs-alist)
+      (mrm-print-section "Customization Documentation" 3)
+      (princ "\n")
+      (dolist (docspec (reverse (mrm-cdr-assoc "defcustom" docs-alist)))
+        (let ((title-text (nth 1 docspec))
+              (doc (nth 2 docspec)))
+          (princ (concat (mrm-make-section (format "`%s`\n\n" title-text) 4)
+                         doc
+                         "\n\n")))))
+
+    ;; Output function/macro docs
+    (mrm-print-section "Function and Macro Documentation" 3)
+    (princ "\n")
+    (dolist (docspec (reverse (mrm-cdr-assoc "defun" docs-alist)))
+      (let ((token (nth 0 docspec))
+            (title-text (nth 1 docspec))
+            (doc (nth 2 docspec)))
+        (princ (concat (mrm-make-section (format "`%s`%s\n\n"
+                                                 title-text
+                                                 (if (string= token "defmacro")
+                                                     " (macro)"
+                                                   ""))
+                                         4)
+                       doc
+                       "\n\n"))))))
+
+(main (mrm-slurp))
 
 (princ "-----
 <div style=\"padding-top:15px;color: #d0d0d0;\">
