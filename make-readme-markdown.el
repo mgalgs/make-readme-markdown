@@ -237,7 +237,6 @@ E.g., `-*- lexical-binding: t; -*-'"
 
   ;; and a newline
   (princ "\n"))
-;; eo print-formatted-line
 
 (defun document-a-function ()
   "Searches for next defun/macro and print markdown documentation."
