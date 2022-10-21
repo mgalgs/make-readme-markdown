@@ -33,8 +33,8 @@ regression_test()
 
     for user in ${users[*]}; do
         curl -s $user > testfile || { echo "Couldn't download $user. Skipping."; continue; }
-        emacs --script make-readme-markdown.el < testfile > testfile.md.before 2>/dev/null
-        emacs --script baseline.el < testfile > testfile.md.after 2>/dev/null
+        emacs --script make-readme-markdown.el < testfile > testfile.md.after 2>/dev/null
+        emacs --script baseline.el < testfile > testfile.md.before 2>/dev/null
         basename=${user##*/}
         if ! diff testfile.md.before testfile.md.after > $basename.diff; then
             echo "$basename changed. Saved diff to $basename.diff. Also copying here:"
