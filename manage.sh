@@ -69,7 +69,7 @@ update_clients()
                 hub fork &>/dev/null
                 git fetch mgalgs &>/dev/null
                 git checkout mgalgs/master &>/dev/null || echo "Couldn't checkout mgalgs/master..."
-                git reset --hard origin/master
+                git reset --hard origin/master &>/dev/null
             }
             rm README.md
             make README.md &>/dev/null
