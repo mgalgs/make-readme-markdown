@@ -48,9 +48,10 @@ You can also invoke it directly with `emacs --script`:
 
     $ emacs --script make-readme-markdown.el <elisp-file-to-parse.el 2>/dev/null
 
-All functions and macros in your module with docstrings will be documented
-in the output unless they've been marked as private. Convention dictates
-that private elisp functions have two hypens, like `cup--noodle`.
+All functions, macros, and customizable variables in your module with
+docstrings will be documented in the output unless they've been marked
+as private. Convention dictates that private elisp functions have two
+hypens, like `cup--noodle`.
 
 ### Badges
 
@@ -99,14 +100,14 @@ blocks of code in your comments by leading the line with 4 spaces (in
 addition to the first space directly following the last semicolon). For
 example:
 
-    (defun strip-comments (line)
+    (defun mrm-strip-comments (line)
       "Strip elisp comments from line"
       (replace-regexp-in-string "^;+ ?" "" line))
 
 Or you can use the triple-backtic+lang notation, like so:
 
 ```elisp
-(defun strip-comments (line)
+(defun mrm-strip-comments (line)
   "Strip elisp comments from line"
   (replace-regexp-in-string "^;+ ?" "" line))
 ```
@@ -134,57 +135,79 @@ already be looking at it... whoa, this is really getting meta...).
 If there's some more syntax you would like to see supported, submit
 an issue at https://github.com/mgalgs/make-readme-markdown/issues
 
-### Function Documentation
+Many of the functions in this module should probably be "private" (named
+with a double-hypen ("--") but are left "public" for illustration
+purposes.
 
 
-#### `(strip-comments LINE)`
+
+### Function and Macro Documentation
+
+#### `(mrm-strip-comments LINE)`
 
 Strip elisp comments from line
 
-#### `(trim-string LINE)`
+#### `(mrm-strip-file-variables LINE)`
+
+Strip elisp file variables from the first LINE in a file.
+E.g., `-*- lexical-binding: t; -*-'
+
+#### `(mrm-trim-string LINE)`
 
 Trim spaces from beginning and end of string
 
-#### `(fix-symbol-references LINE)`
+#### `(mrm-fix-symbol-references LINE)`
 
 Fix refs like `this` so they don't turn adjacent text into code.
 
-#### `(make-section LINE LEVEL)`
+#### `(mrm-make-section LINE LEVEL)`
 
 Makes a markdown section using the `#` syntax.
 
-#### `(print-section LINE LEVEL)`
+#### `(mrm-print-section LINE LEVEL)`
 
-Prints a section made with `make-section`.
+Prints a section made with `mrm-make-section`.
 
-#### `(slurp)`
+#### `(mrm-slurp)`
 
 Read all text from stdin as list of lines
 
-#### `(wrap-img-tags LINE)`
+#### `(mrm-wrap-img-tags LINE)`
 
 Wrap image hyperlinks with img tags.
 
-#### `(print-formatted-line LINE)`
+#### `(mrm-print-formatted-line LINE)`
 
 Prints a line formatted as markdown.
 
-#### `(document-a-function)`
+#### `(mrm-parse-docs-for-a-thing)`
 
-Searches for next defun/macro and print markdown documentation.
+Searches for the next defun/defmacro/defcustom and prints
+markdown documentation.
+Returns a list of the form (token token-name title-text docstring).
+Example return value:
+("defun" "document-a-defmacro" "(document-a-defmacro CODE)" "Takes a defmacro form and..."
 
-#### `(squeeze-spaces TXT)`
+#### `(mrm-document-a-defcustom CODE)`
+
+Takes a defcustom form and returns documentation for it as a
+string
+
+#### `(mrm-document-a-defun CODE)`
+
+Takes a defun form and returns documentation for it as a string
+
+#### `(mrm-squeeze-spaces TXT)`
 
 Coalesce whitespace.
 
-#### `(print-badges LINES)`
+#### `(mrm-print-badges LINES)`
 
 Print badges for license, package repo, etc.
-
 Tries to parse a license from the comments, printing a badge for
 any license found.
 
-#### `(print-emacs-icon)`
+#### `(mrm-print-emacs-icon)`
 
 Print emacs icon to generate a fancy README.md.
 
