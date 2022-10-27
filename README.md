@@ -184,9 +184,9 @@ Prints a line formatted as markdown.
 
 Searches for the next defun/defmacro/defcustom and prints
 markdown documentation.
-Returns a list of the form (token token-name title-text docstring).
+Returns a list of the form `(token token-name title-text docstring)`.
 Example return value:
-("defun" "document-a-defmacro" "(document-a-defmacro CODE)" "Takes a defmacro form and..."
+`("defun" "document-a-defmacro" "(document-a-defmacro CODE)" "Takes a defmacro form and..."`
 
 #### `(mrm-document-a-defcustom CODE)`
 
